@@ -14,9 +14,6 @@ public:
 	~ClassicCW();
 	enum CellState { csUndef = 0, csEmpty, csFilled };		// состояния клеток
 	
-/*public slots:
-	void showInfo();*/
-	
 protected:
 	CellState**	field;			// поле
 	quint16		fX;				// текущая выделенная

@@ -43,3 +43,9 @@ CrosswordInfo::CrosswordInfo(const QString& name, const QString& author, const Q
 	
 	setWindowTitle(trUtf8("Crossword info"));
 }
+
+/*CrosswordInfo::~CrosswordInfo()
+{
+	qDebug() << "destructor";
+}
+*/

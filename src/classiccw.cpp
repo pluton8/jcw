@@ -167,12 +167,13 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 		//qDebug() << domElem.text();
 	}
 	
-	// VVV
-	fX = lw;
-	fY = th;
-	// ^^^ не могу понять, почему вылетает при инициализации
+	fX = oldFX = lw;
+	fY = oldFY = th;
 	setMouseTracking(true);				// включаем отслеживание движения мыши
 	setFocusPolicy(Qt::StrongFocus);
+	/*show();
+	setFocus(Qt::TabFocusReason);		// <<< не работает
+	qDebug() << qApp->focusWidget();*/
 }
 
 ClassicCW::~ClassicCW()
@@ -202,17 +203,9 @@ ClassicCW::~ClassicCW()
 	}
 }
 
-/*void ClassicCW::showInfo()
-{
-	if (ciDialog != NULL)
-		ciDialog = new CrosswordInfo(name, author, date, comment, this);
-	ciDialog->show();
-}*/
-
 void ClassicCW::paintEvent(QPaintEvent* /*event*/)
 {
 	QPainter painter(this);			// объект QPainter для рисования
-	//qDebug() << &painter;
 	
 	//qDebug() << size().width() << '*' << size().height();
 	//margin = 30;
@@ -332,11 +325,11 @@ void ClassicCW::paintEvent(QPaintEvent* /*event*/)
 	painter.drawText(margin, margin, lw * cellSize, th * cellSize, Qt::AlignCenter,
 					 QString::number(fw) + 'x' + QString::number(fh));
 	
-	if (!((fX < lw && fY < th) || (fX >= fw + lw) || (fY >= fh + th)))
-	{		//если выделенная клетка находится в области поля или заголовков, то нарисовать её
-		painter.setPen(Qt::red);
-		painter.drawRect(margin + fX * cellSize, margin + fY * cellSize, cellSize, cellSize);
-	}
+	//if (!((fX < lw && fY < th) || (fX >= fw + lw) || (fY >= fh + th)))
+	//{
+	painter.setPen(Qt::red);
+	painter.drawRect(margin + fX * cellSize, margin + fY * cellSize, cellSize, cellSize);
+	//}
 	
 	if (hasFocus())
 	{
@@ -354,15 +347,19 @@ bool ClassicCW::calcHighlightXY(const QPoint& originPoint)
 	bool changed = false;
 	fX = (originPoint.x() - margin) / cellSize;					// координата клетки
 	fY = (originPoint.y() - margin) / cellSize;					// на поле
-	if (!((fX < lw && fY < th) || (fX >= fw + lw) || (fY >= fh + th)))
-		//если выделенная клетка находится в области поля или заголовков
-		if (fX != oldFX || fY != oldFY)
-		{
-			changed = true;
-			update();
-			oldFX = fX;
-			oldFY = fY;
-		}
+	if ((fX < lw && fY < th) || (fX >= fw + lw) || (fY >= fh + th))
+		//если выделенная клетка не находится в области поля или заголовков, восстанавливаем предыдущее значение
+	{
+		fX = oldFX;
+		fY = oldFY;
+	}
+	else if (fX != oldFX || fY != oldFY)
+	{
+		changed = true;
+		update();
+		oldFX = fX;
+		oldFY = fY;
+	}
 	return changed;
 }
 
@@ -482,13 +479,44 @@ void ClassicCW::keyPressEvent(QKeyEvent* event)
 	switch (event->key())
 	{
 		case Qt::Key_Up:
-			if (fY > 1)
-			{
+			if (fY > th || (fX > lw - 1 && fY > 0))
 				fY--;
+			break;
+		case Qt::Key_Down:
+			if (fY < fh + th - 1)
+				fY++;
+			break;
+		case Qt::Key_Left:
+			if (fX > lw || (fY > th - 1 && fX > 0))
+				fX--;
+			break;
+		case Qt::Key_Right:
+			if (fX < fw + lw - 1)
+				fX++;
+			break;
+		case Qt::Key_Space:
+			if (fX >= lw && fX < fw + lw && fY >= th && fY < th + fh)
+			{
+				quint16 fieldX = fX - lw;
+				quint16 fieldY = fY - th;
+				field[fieldX][fieldY] = csFilled;
+			}
+			else if (fX < lw && fY >= th && fY < (fh + th))
+			{
+				quint16 fieldY = fY - th;
+				lhdr[fX][fieldY] *= -1;
+				update();
+			}
+			else if (fX >= lw && fX < lw + fw && fY < th)
+			{
+				quint16 fieldX = fX - lw;
+				thdr[fieldX][th - fY - 1] *= -1;
 				update();
 			}
 			break;
 		default:
 			QWidget::keyPressEvent(event);
+			return;
 	}
+	update();
 }

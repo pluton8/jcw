@@ -11,6 +11,7 @@ public:
 	CrosswordInfo(const QString& name = QString(), const QString& author = QString(),
 			const QString& date = QString(), const QString& comment = QString(),
 			QWidget* parent = NULL, Qt::WindowFlags f = Qt::Dialog);
+	//~CrosswordInfo();
 	
 protected:
 	QLabel*			nameLabel;
