@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<crossword type="classic" ver="0.1" width="7" height="7" name="NewChannelLogo" author="j" date="07.2008">
+	<!--<comment>hello,&lt;br&gt;world!</comment>-->
+	<!--
+		type	- тип кроссворда;
+		ver		- версия описания;		[не обязательно; дефолтом - 0.1]
+		width	- ширина поля;
+		height	- высота поля;
+		name	- название кроссворда;	[не обязательно]
+		author	- автор кроссворда;		[не обязательно]
+		date	- дата создания;		[не обязательно]
+		comment	- юзерский комент;		[не обязательно]
+	-->
+	<topheader height="3">3;1,1;1,3,-1;1,1,1;1,3,1;1,1;3</topheader>
+	<leftheader width="4">3;1,1;1,1,1,1;1,3,1;1,-10,1,1;1,1;3</leftheader>
+	<field>
+		<cell col="2" row="3" state="filled" />
+		<cell col="6" row="0" state="empty" />
+	</field>
+	<!--
+		topheader	- значения в верхнем заголовке
+		leftheader	- значения в левом заголовке
+		field		- описание клеток на поле		[не обязательно]
+	-->
+</crossword>
