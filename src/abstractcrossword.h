@@ -13,6 +13,7 @@ public:
 	//enum CellState { csUndef = 0 };			// возможные состояния клеток
 	bool isNeedDelete() const;
 	void showInfo();
+	QString getName() const;
 	
 protected:
 	quint16			cellSize;					// размер клетки, пикселей

@@ -25,6 +25,7 @@ protected:
 	QAction*			showInfoAction;
 	QAction*			quitAction;
 	QAction*			aboutAction;
+	QString*			windowName;
 	
 protected slots:
 	void openCrossword();

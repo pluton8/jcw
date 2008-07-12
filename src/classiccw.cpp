@@ -25,10 +25,6 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	author = domElem.attribute("author");
 	date = domElem.attribute("date");
 	//comment = domElem.attribute("comment");
-/*	fw = 7;
-	fh = 7;
-	th = 3;
-	lw = 4;*/
 	quint16 i;
 	quint16 j;
 	field = new CellState* [fw];		// создание двумерного динамического массива
@@ -38,11 +34,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 		field[i] = new CellState[fh];
 		bzero(field[i], fh * sizeof(CellState));
 	}
-	/*field[0][2] = csFilled;
-	field[5][0] = csEmpty;*/
 	
-	
-	//domElem = root;
 	QStringList list;
 	QStringList list2;
 	QDomNodeList nodes = root.elementsByTagName("topheader");
@@ -69,22 +61,6 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 					checkOk;
 				}
 			}
-			//qDebug() << domElem.text();
-			/*thdr[0][0] = -3;
-			thdr[1][0] = 1;
-			thdr[1][1] = 1;
-			thdr[2][0] = 1;
-			thdr[2][1] = 3;
-			thdr[2][2] = 1;
-			thdr[3][0] = 1;
-			thdr[3][1] = 10;
-			thdr[3][2] = 1;
-			thdr[4][0] = 1;
-			thdr[4][1] = 3;
-			thdr[4][2] = 1;
-			thdr[5][0] = 1;
-			thdr[5][1] = 1;
-			thdr[6][0] = 3;*/
 		}
 	}
 	else
@@ -118,23 +94,6 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 					checkOk;
 				}
 			}
-			/*lhdr[0][2] = 1;
-			lhdr[0][4] = 1;
-			lhdr[1][2] = 1;
-			lhdr[1][3] = 1;
-			lhdr[1][4] = 1;
-			lhdr[2][1] = 1;
-			lhdr[2][2] = 1;
-			lhdr[2][3] = 3;
-			lhdr[2][4] = 1;
-			lhdr[2][5] = 1;
-			lhdr[3][0] = -3;
-			lhdr[3][1] = 1;
-			lhdr[3][2] = 1;
-			lhdr[3][3] = 1;
-			lhdr[3][4] = 1;
-			lhdr[3][5] = 1;
-			lhdr[3][6] = 3;*/
 		}
 	}
 	else
@@ -164,9 +123,9 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 		domElem = nodes.item(0).toElement();
 		if (!domElem.isNull())
 			comment = domElem.text();
-		//qDebug() << domElem.text();
 	}
 	
+	keyFillPressed = false;
 	fX = oldFX = lw;
 	fY = oldFY = th;
 	setMouseTracking(true);				// включаем отслеживание движения мыши
@@ -379,7 +338,6 @@ void ClassicCW::mouseMoveEvent(QMouseEvent* event)
 			QMouseEvent* mouseEvent = new QMouseEvent(QEvent::MouseButtonPress, event->pos(),
 					button, event->buttons(), event->modifiers());
 			mousePressEvent(mouseEvent);
-			//qDebug("!!!");
 		}
 	}
 	event->accept();
@@ -388,59 +346,26 @@ void ClassicCW::mouseMoveEvent(QMouseEvent* event)
 void ClassicCW::mousePressEvent(QMouseEvent* event)
 {
 	calcHighlightXY(event->pos());
-	if (fX >= lw && fX < (fw + lw) && fY >= th && fY < (th + fh))	// если попали на поле
+	CellState newState;
+	switch (event->button())
 	{
-		quint16 fieldX = fX - lw;
-		quint16 fieldY = fY - th;
-		//qDebug("%d",(int)event->button());
-		switch (event->button())
-		{
-			case Qt::LeftButton:
-				field[fieldX][fieldY] = csFilled;
-				break;
-			case Qt::MidButton:
-				field[fieldX][fieldY] = csUndef;
-				break;
-			case Qt::RightButton:
-				field[fieldX][fieldY] = csEmpty;
-				break;
-		}
-		update();
-		/*switch (field[fieldX][fieldY])
-		{
-			case csUndef:
-				if (event->button() == Qt::LeftButton)
-					field[fieldX][fieldY] = csFilled;
-				break;
-			case csFilled:
-				if (event->button() == Qt::LeftButton)
-					field[fieldX][fieldY] = csEmpty;
-				else if (event->button() == Qt::RightButton)
-					field[fieldX][fieldY] = csUndef;
-				break;
-			case csEmpty:
-				if (event->button() == Qt::RightButton)
-					field[fieldX][fieldY] = csFilled;
-				break;
-		}*/
+		case Qt::LeftButton:
+			newState = csFilled;
+			break;
+		case Qt::MidButton:
+			newState = csUndef;
+			break;
+		case Qt::RightButton:
+			newState = csEmpty;
+			break;
 	}
-	else if (/*fX >= 0 && */fX < lw && fY >= th && fY < (fh + th))	// если попали в левый заголовок
-	{
-		quint16 fieldY = fY - th;
-		lhdr[fX][fieldY] *= -1;
-		update();
-		/*field[fX][fieldY] *= -1;
-		src/classiccw.cpp:266: error: no match for 'operator*=' in '*((*(((ClassicCW*)this)->ClassicCW::field + ((ClassicCW::CellState**)(((unsigned int)((ClassicCW*)this)->ClassicCW::fX) * 4u)))) + ((ClassicCW::CellState*)(((unsigned int)fieldY) * 4u))) *= -0x000000000000001'
-			^^^^^ фигасе ошибка
-		*/
-	}
-	else if (fX >= lw && fX < (lw + fw) && /*fY >= 0 && */fY < th)	// если попали в верхний заголовок
-	{
-		quint16 fieldX = fX - lw;
-		thdr[fieldX][th - fY - 1] *= -1;
-		update();
-	}
+	changeCellState(newState);
+	//else
+	//{
 	event->accept();
+	//	return;
+	//}
+	update();
 }
 
 void ClassicCW::wheelEvent(QWheelEvent* event)
@@ -472,51 +397,105 @@ void ClassicCW::wheelEvent(QWheelEvent* event)
 	return;
 }
 
+#define checkPressedKeys \
+		if (keyFillPressed) \
+			changeCellState(csFilled); \
+		else if (keyEmptyPressed) \
+			changeCellState(csEmpty); \
+		else if (keyUndefPressed) \
+			changeCellState(csUndef);
+
+
 void ClassicCW::keyPressEvent(QKeyEvent* event)
 {
 	//qDebug() << QString::number(event->key(), 16);
-//	qDebug() << this->hasFocus();
 	switch (event->key())
 	{
 		case Qt::Key_Up:
 			if (fY > th || (fX > lw - 1 && fY > 0))
+			{
 				fY--;
+				checkPressedKeys;
+			}
 			break;
 		case Qt::Key_Down:
 			if (fY < fh + th - 1)
+			{
 				fY++;
+				checkPressedKeys;
+			}
 			break;
 		case Qt::Key_Left:
 			if (fX > lw || (fY > th - 1 && fX > 0))
+			{
 				fX--;
+				checkPressedKeys;
+			}
 			break;
 		case Qt::Key_Right:
 			if (fX < fw + lw - 1)
+			{
 				fX++;
+				checkPressedKeys;
+			}
 			break;
-		case Qt::Key_Space:
-			if (fX >= lw && fX < fw + lw && fY >= th && fY < th + fh)
-			{
-				quint16 fieldX = fX - lw;
-				quint16 fieldY = fY - th;
-				field[fieldX][fieldY] = csFilled;
-			}
-			else if (fX < lw && fY >= th && fY < (fh + th))
-			{
-				quint16 fieldY = fY - th;
-				lhdr[fX][fieldY] *= -1;
-				update();
-			}
-			else if (fX >= lw && fX < lw + fw && fY < th)
-			{
-				quint16 fieldX = fX - lw;
-				thdr[fieldX][th - fY - 1] *= -1;
-				update();
-			}
+		case Qt::Key_Z:									// Z -> закрашено
+			changeCellState(csFilled);
+			keyFillPressed = true;
+			break;
+		case Qt::Key_X:									// X -> пусто
+			changeCellState(csEmpty);
+			keyEmptyPressed = true;
+			break;
+		case Qt::Key_C:									// C -> неизвестно
+			changeCellState(csUndef);
+			keyUndefPressed = true;
+			break;
+		case Qt::Key_Plus:								// + -> увеличить размер клетки
+			cellSize++;
+			break;
+		case Qt::Key_Minus:								// - -> уменьшить размер клетки
+			if (cellSize > MIN_CELLSIZE)
+				cellSize--;
 			break;
 		default:
 			QWidget::keyPressEvent(event);
 			return;
 	}
 	update();
+}
+
+void ClassicCW::keyReleaseEvent(QKeyEvent* event)
+{
+	switch (event->key())
+	{
+		case Qt::Key_Z:
+			keyFillPressed = false;
+			break;
+		case Qt::Key_X:
+			keyEmptyPressed = false;
+			break;
+		case Qt::Key_C:
+			keyUndefPressed = false;
+			break;
+		default:
+			QWidget::keyReleaseEvent(event);
+			return;
+	}
+}
+
+void ClassicCW::changeCellState(CellState newState)
+{
+	quint16 fieldX = fX - lw;
+	quint16 fieldY = fY - th;
+	if (fX >= lw && fX < fw + lw && fY >= th && fY < th + fh)	// если попали на поле
+		field[fieldX][fieldY] = newState;
+	else if (fX < lw && fY >= th && fY < fh + th)	// если попали в левый заголовок
+		lhdr[fX][fieldY] *= -1;
+		/*field[fX][fieldY] *= -1;
+		src/classiccw.cpp:266: error: no match for 'operator*=' in '*((*(((ClassicCW*)this)->ClassicCW::field + ((ClassicCW::CellState**)(((unsigned int)((ClassicCW*)this)->ClassicCW::fX) * 4u)))) + ((ClassicCW::CellState*)(((unsigned int)fieldY) * 4u))) *= -0x000000000000001'
+		^^^^^ фигасе ошибка
+		*/
+	else if (fX >= lw && fX < lw + fw && fY < th)	// если попали в верхний заголовок
+		thdr[fieldX][th - fY - 1] *= -1;
 }

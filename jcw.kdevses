@@ -1,31 +1,25 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="8" >
+ <DocsAndViews NumberOfDocuments="6" >
   <Doc0 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/mainwnd.cpp" >
    <View0 Encoding="UTF-8" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/j/proj/jcw/newchannel.jcw" >
+  <Doc1 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/mainwnd.h" >
    <View0 Encoding="UTF-8" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/mainwnd.h" >
+  <Doc2 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/abstractcrossword.h" >
    <View0 Encoding="UTF-8" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/classiccw.cpp" >
-   <View0 Encoding="UTF-8" Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/j/proj/jcw/TODO" >
+   <View0 Encoding="UTF-8" line="4" Type="Source" />
   </Doc3>
   <Doc4 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/classiccw.h" >
    <View0 Encoding="UTF-8" Type="Source" />
   </Doc4>
-  <Doc5 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/abstractcrossword.cpp" >
-   <View0 Encoding="UTF-8" Type="Source" />
+  <Doc5 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/classiccw.cpp" >
+   <View0 Encoding="UTF-8" line="489" Type="Source" />
   </Doc5>
-  <Doc6 NumberOfViews="1" URL="file:///home/j/proj/jcw/src/abstractcrossword.h" >
-   <View0 Encoding="UTF-8" Type="Source" />
-  </Doc6>
-  <Doc7 NumberOfViews="1" URL="file:///home/j/proj/jcw/TODO" >
-   <View0 Encoding="UTF-8" line="4" Type="Source" />
-  </Doc7>
  </DocsAndViews>
  <pluginList>
   <kdevdebugger>

@@ -1,3 +1,12 @@
+/****************************
+Project:	jcw
+Author:		pluton
+JabberID:	j8@jabber.ru
+License:	see ../LICENSE file
+Date:		07.2008+
+Site:		http://sourceforge.net/projects/jcw/
+****************************/
+
 #include <QtGui>
 #include "mainwnd.h"
 

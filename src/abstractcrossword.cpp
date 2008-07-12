@@ -3,7 +3,7 @@
 AbstractCrossword::AbstractCrossword(QWidget* parent, Qt::WindowFlags f)
 	: QWidget(parent, f)
 {
-	cellSize = 15;
+	cellSize = 20;
 	margin = 20;
 	needDelete = false;
 //	name = author = date = NULL;
@@ -21,6 +21,11 @@ void AbstractCrossword::showInfo()
 		ciDialog = new CrosswordInfo(name, author, date, comment, this);
 	ciDialog->show();
 //	connect(ciDialog, SIGNAL(destroyed(QObject*)), this, SLOT(ciDialogDestroyed()));
+}
+
+QString AbstractCrossword::getName() const
+{
+	return name;
 }
 
 /*void AbstractCrossword::ciDialogDestroyed()

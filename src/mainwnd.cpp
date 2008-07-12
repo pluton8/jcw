@@ -8,7 +8,8 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	/*		настройки глав окна 	*/
 	/*if (this->objectName().isEmpty())
 		this->setObjectName(QString::fromUtf8("MainWnd"));*/
-	this->setWindowTitle("jcw");
+	windowName = new QString("jcw");
+	this->setWindowTitle(*windowName);
 	this->setGeometry(150, 150, 800, 600);
 	
 	/*		создаём меню и тулбар		*/
@@ -70,6 +71,7 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	crossword->setGeometry(3, 3, 695, 495);
 	scrollArea->setWidget(crossword);
 	showInfoAction->setEnabled(true);
+	setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
 }
 
 void MainWnd::openCrossword()
@@ -92,9 +94,12 @@ void MainWnd::openCrossword()
 	int errorCol;
 	if (!domDoc.setContent(&file, &errorMsg, &errorLine, &errorCol))	// если ошибка парсинга файла
 	{
-		QMessageBox::critical(this, trUtf8("Error"), trUtf8("Invalid file (") + errorMsg +
+		/*QMessageBox::critical(this, trUtf8("Error"), trUtf8("Invalid file (") + errorMsg +
 				trUtf8(")\nError line: ") + QString::number(errorLine) + trUtf8("\nError column: ") +
-				QString::number(errorCol));
+				QString::number(errorCol));*/
+		QMessageBox::critical(this, trUtf8("Error"), QString(trUtf8(
+				"Invalid file (%1)\nError line: %2\nError column: %3")).arg(errorMsg).arg(
+				QString::number(errorLine)).arg(QString::number(errorCol)));
 		return;
 	}
 	
@@ -122,6 +127,7 @@ void MainWnd::openCrossword()
 					crossword->setGeometry(3, 3, 695, 495);
 					scrollArea->setWidget(crossword);
 					showInfoAction->setEnabled(true);
+					setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
 				}
 			}
 			else

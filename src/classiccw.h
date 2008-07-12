@@ -17,18 +17,23 @@ public:
 protected:
 	CellState**	field;			// поле
 	quint16		fX;				// текущая выделенная
-	quint16		fY;				// клетка
+	quint16		fY;				//		клетка
 	quint16		oldFX;			// предыдущая выделенная
-	quint16		oldFY;			// клетка
+	quint16		oldFY;			//		клетка
+	bool		keyFillPressed;	// флаг, показывающий зажата ли кнопка закрашивания (дефолтом - пробел)
+	bool		keyEmptyPressed;
+	bool		keyUndefPressed;
 	
 	void paintEvent(QPaintEvent* event);				// метод рисования
 	void wheelEvent(QWheelEvent* event);				// скроллинг
 	void mouseMoveEvent(QMouseEvent* event);			// движение мыши
 	void mousePressEvent(QMouseEvent* event);			// клик мыши
 	void keyPressEvent(QKeyEvent* event);				// нажатие клавиши клавиатуры
+	void keyReleaseEvent(QKeyEvent* event);
 	
 	bool calcHighlightXY(const QPoint& originPoint);	// вычисляет координаты выделенной клетки
-				// возвращает true, если было изменение
+														// возвращает true, если было изменение
+	void changeCellState(CellState newState);			// изменяет состояние клетки (fX;fY) на newState
 };
 
 #endif
