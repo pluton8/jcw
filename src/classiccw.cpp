@@ -126,6 +126,8 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	}
 	
 	keyFillPressed = false;
+	keyEmptyPressed = false;
+	keyUndefPressed = false;
 	fX = oldFX = lw;
 	fY = oldFY = th;
 	setMouseTracking(true);				// включаем отслеживание движения мыши
@@ -166,14 +168,9 @@ void ClassicCW::paintEvent(QPaintEvent* /*event*/)
 {
 	QPainter painter(this);			// объект QPainter для рисования
 	
-	//qDebug() << size().width() << '*' << size().height();
-	//margin = 30;
-	//int fwpx = (margin * 2) + (cellSize * (lw + fw));	// размер всего поля
-	//int fhpx = (margin * 2) + (cellSize * (th + fh));
 	QSize fieldSize((margin * 2) + (cellSize * (lw + fw)), (margin * 2) + (cellSize * (th + fh)));
 	QSize parentSize = parentWidget()->size();
 	resize(fieldSize.expandedTo(parentSize));
-	//painter.drawRect(0, 0, fwpx - 1, fhpx - 1);
 	QPen penNormal = painter.pen();			// перо рисования границ
 	penNormal.setWidth(1);
 	QPen penBold = painter.pen();			// перо рисования жирных границ
@@ -207,7 +204,6 @@ void ClassicCW::paintEvent(QPaintEvent* /*event*/)
 	for (i = 1; i < th; i++)				// рисуем горизонтальные линии
 		painter.drawLine(0, i * cellSize, rigthX, i * cellSize);
 	
-	//qDebug() << painter.font().pointSize();
 	for (i = 0; i < fw; i++)
 		for (j = 0; j < th; j++)
 			if (thdr[i][j] != 0)
@@ -277,27 +273,18 @@ void ClassicCW::paintEvent(QPaintEvent* /*event*/)
 	/*		рисуем размеры поля		*/
 	font.setPointSize(cellSize * 1.2);
 	painter.setFont(font);
-	/*painter.drawText(margin, margin, lw * cellSize, th * cellSize, Qt::AlignRight | Qt::AlignTop,
-			QString::number(fw));
-	painter.drawText(margin, margin, lw * cellSize, (th + 0.4) * cellSize, Qt::AlignLeft | Qt::AlignBottom,
-			QString::number(fh));*/
 	painter.drawText(margin, margin, lw * cellSize, th * cellSize, Qt::AlignCenter,
-					 QString::number(fw) + 'x' + QString::number(fh));
+			QString("%1x%2").arg(fw).arg(fh));
 	
-	//if (!((fX < lw && fY < th) || (fX >= fw + lw) || (fY >= fh + th)))
-	//{
 	painter.setPen(Qt::red);
 	painter.drawRect(margin + fX * cellSize, margin + fY * cellSize, cellSize, cellSize);
-	//}
 	
 	if (hasFocus())
 	{
-		//qDebug()<<"23";
 		QStyleOptionFocusRect option;
 		option.initFrom(this);
 		//option.backgroundColor = palette().light().color();
 		style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
-		//painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
 	}
 }
 
@@ -360,11 +347,7 @@ void ClassicCW::mousePressEvent(QMouseEvent* event)
 			break;
 	}
 	changeCellState(newState);
-	//else
-	//{
 	event->accept();
-	//	return;
-	//}
 	update();
 }
 
@@ -372,7 +355,6 @@ void ClassicCW::wheelEvent(QWheelEvent* event)
 {
 	if (event->modifiers().testFlag(Qt::ControlModifier))
 	{									// если нажат Ctrl, то изменяем размер клетки
-		//qDebug() << event->delta();
 		quint16 d = qAbs(event->delta() / 120);
 		if (event->delta() > 0)			// скроллинг вверх
 			cellSize += d;
@@ -498,4 +480,29 @@ void ClassicCW::changeCellState(CellState newState)
 		*/
 	else if (fX >= lw && fX < lw + fw && fY < th)	// если попали в верхний заголовок
 		thdr[fieldX][th - fY - 1] *= -1;
+	
+	// надо запустить чекалку поля
+	emit cellStateChanged();
+}
+
+void ClassicCW::clearField()
+{
+	quint16 i;
+	quint16 j;
+	for (i = 0; i < fw; i++)
+	{
+		for (j = 0; j < fh; j++)
+			field[i][j] = csUndef;
+		for (j = 0; j < th; j++)
+			thdr[i][j] = qAbs(thdr[i][j]);
+	}
+	for (i = 0; i < lw; i++)
+		for (j = 0; j < fh; j++)
+			lhdr[i][j] = qAbs(lhdr[i][j]);
+	update();
+}
+
+ClassicCW::CellState** ClassicCW::getField()
+{
+	return field;
 }

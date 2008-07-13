@@ -13,14 +13,15 @@ public:
 	ClassicCW(const QDomElement& root, QWidget* parent = NULL, Qt::WindowFlags f = 0);
 	~ClassicCW();
 	enum CellState { csUndef = 0, csEmpty, csFilled };		// состояния клеток
+	CellState** getField();
 	
 protected:
-	CellState**	field;			// поле
-	quint16		fX;				// текущая выделенная
-	quint16		fY;				//		клетка
-	quint16		oldFX;			// предыдущая выделенная
-	quint16		oldFY;			//		клетка
-	bool		keyFillPressed;	// флаг, показывающий зажата ли кнопка закрашивания (дефолтом - пробел)
+	CellState**	field;				// поле
+	quint16		fX;					// текущая выделенная
+	quint16		fY;					//		клетка
+	quint16		oldFX;				// предыдущая выделенная
+	quint16		oldFY;				//		клетка
+	bool		keyFillPressed;		// флаг, показывающий зажата ли кнопка закрашивания
 	bool		keyEmptyPressed;
 	bool		keyUndefPressed;
 	
@@ -34,6 +35,7 @@ protected:
 	bool calcHighlightXY(const QPoint& originPoint);	// вычисляет координаты выделенной клетки
 														// возвращает true, если было изменение
 	void changeCellState(CellState newState);			// изменяет состояние клетки (fX;fY) на newState
+	void clearField();									// очистка поля
 };
 
 #endif

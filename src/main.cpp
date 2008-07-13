@@ -1,10 +1,10 @@
 /****************************
-Project:	jcw
-Author:		pluton
-JabberID:	j8@jabber.ru
-License:	see ../LICENSE file
-Date:		07.2008+
-Site:		http://sourceforge.net/projects/jcw/
+Проект:		Project:	jcw
+Автор:		Author:		pluton
+Связь:		JabberID:	j8@jabber.ru
+Лицензия:	License:	see ../LICENSE file
+Дата:		Date:		07.2008+
+Сайт:		Site:		http://sourceforge.net/projects/jcw/
 ****************************/
 
 #include <QtGui>

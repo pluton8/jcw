@@ -3,6 +3,9 @@
 
 #include <QtGui>
 #include "crosswordinfo.h"
+//#include "fieldcheckerthread.h"
+
+//class FieldCheckerThread;
 
 class AbstractCrossword : public QWidget//QGraphicsView//
 {
@@ -11,9 +14,12 @@ Q_OBJECT
 public:
     AbstractCrossword(QWidget* parent = 0, Qt::WindowFlags f = 0);
 	//enum CellState { csUndef = 0 };			// возможные состояния клеток
-	bool isNeedDelete() const;
-	void showInfo();
-	QString getName() const;
+	bool isNeedDelete() const;					// возвращает флаг ошибки
+	QString getName() const;					// возвращает название кроссворда
+	
+public slots:
+	void showInfo();							// показ диалога с инфой
+	virtual void clearField();					// очистка поля
 	
 protected:
 	quint16			cellSize;					// размер клетки, пикселей
@@ -23,12 +29,11 @@ protected:
 	QString			author;						// автор
 	QString			date;						// дата создания
 	QString			comment;					// юзерский коммент
-	CrosswordInfo*	ciDialog;
+	CrosswordInfo*	ciDialog;					// указатель на диалог инфо
 	static const quint16 MIN_CELLSIZE = 10;		// минимальный размер клетки
-	//virtual void paintEvent(QPaintEvent* event);
 	
-/*protected slots:
-	void ciDialogDestroyed();*/
+signals:
+	void cellStateChanged();
 };
 
 #endif

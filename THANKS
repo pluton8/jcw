@@ -1,0 +1,8 @@
+хочу сказать спасибо:
+* Trolltech				за отличный фреймворк Qt4;
+* The KDE Developers	за IDE KDevelop;
+* себе :)				за мыслю о программе и время для написания;
+
+в проекте использованы сторонние файлы:
+* quit.png (<- exit.png), fileopen.png из /usr/lib/qt4/demos/undo/icons
+* LICENSE (<- http://www.gnu.org/licenses/gpl-2.0.txt)

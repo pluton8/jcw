@@ -21,19 +21,30 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	
 	openCWAction = new QAction(trUtf8("&Open crossword..."), menu);		// открыть файл
 	openCWAction->setShortcut(Qt::CTRL + Qt::Key_O);
+	openCWAction->setIcon(QIcon(":/pics/fileopen.png"));
 	connect(openCWAction, SIGNAL(triggered()), this, SLOT(openCrossword()));
 	menu->addAction(openCWAction);
 	toolBar->addAction(openCWAction);
-	showInfoAction = new QAction(trUtf8("&Show info..."), menu);			// показать инфу о кроссворде
+	
+	showInfoAction = new QAction(trUtf8("&Show info..."), menu);		// показать инфу о кроссворде
 	showInfoAction->setShortcut(Qt::CTRL + Qt::Key_I);
 	showInfoAction->setEnabled(false);
-	connect(showInfoAction, SIGNAL(triggered()), this, SLOT(showInfo()));
+	//connect(showInfoAction, SIGNAL(triggered()), this, SLOT(showInfo()));
 	menu->addAction(showInfoAction);
 	toolBar->addAction(showInfoAction);
+	
+	clearFieldAction = new QAction(trUtf8("&Clear field"), menu);		// очистка поля
+	clearFieldAction->setShortcut(Qt::CTRL + Qt::Key_C);
+	//connect(clearFieldAction, SIGNAL(triggered()), this, SLOT(clearField()));
+	menu->addAction(clearFieldAction);
+	toolBar->addAction(clearFieldAction);
+	
 	menu->addSeparator();
 	toolBar->addSeparator();
+	
 	quitAction = new QAction(trUtf8("&Quit"), menu);					// выход
 	quitAction->setShortcut(Qt::ALT + Qt::Key_F4);
+	quitAction->setIcon(QIcon(":/pics/quit.png"));
 	connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
 	menu->addAction(quitAction);
 	toolBar->addAction(quitAction);
@@ -47,7 +58,9 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	
 	/*		добавляем статусбар		*/
 	statusBar = new QStatusBar(this);
-	statusBar->showMessage("hello, world!");
+	//statusBar->showMessage("hello, world!");
+	checkResultLabel = new QLabel("---", statusBar);
+	statusBar->addWidget(checkResultLabel);
 	this->setStatusBar(statusBar);
 	
 	/*		добавляем виджеты		*/
@@ -64,6 +77,12 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	//scrollArea->setWidget(crossword);
 	scrollArea->show();
 	
+	//cwType = ctNone;
+	fieldChecker.start();
+	fieldChecker.setResultLabel(checkResultLabel);
+	//connect(this, SIGNAL(cellStateChanged()), &fieldChecker, SLOT(check()));
+	
+	/*	убрать это потом:	*/
 	QFile file("newchannel.jcw");
 	QDomDocument domDoc;
 	domDoc.setContent(&file);
@@ -71,7 +90,16 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	crossword->setGeometry(3, 3, 695, 495);
 	scrollArea->setWidget(crossword);
 	showInfoAction->setEnabled(true);
-	setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
+	if (!crossword->getName().isEmpty())
+		setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
+	fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
+	connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
+	connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
+}
+
+MainWnd::~MainWnd()
+{
+	fieldChecker.exit();
 }
 
 void MainWnd::openCrossword()
@@ -127,7 +155,11 @@ void MainWnd::openCrossword()
 					crossword->setGeometry(3, 3, 695, 495);
 					scrollArea->setWidget(crossword);
 					showInfoAction->setEnabled(true);
-					setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
+					if (!crossword->getName().isEmpty())
+						setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
+					fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
+					connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
+					connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
 				}
 			}
 			else
@@ -137,10 +169,4 @@ void MainWnd::openCrossword()
 	}
 	
 	file.close();
-}
-
-void MainWnd::showInfo()
-{
-	if (crossword != NULL)
-		crossword->showInfo();
 }

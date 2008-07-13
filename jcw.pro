@@ -7,13 +7,15 @@ SOURCES = \
 	src/abstractcrossword.cpp \
 	src/rectcrossword.cpp \
 	src/classiccw.cpp \
-	src/crosswordinfo.cpp
+	src/crosswordinfo.cpp \
+	src/fieldcheckerthread.cpp
 HEADERS = \
 	src/mainwnd.h \
 	src/abstractcrossword.h \
 	src/rectcrossword.h \
 	src/classiccw.h \
-	src/crosswordinfo.h
+	src/crosswordinfo.h \
+	src/fieldcheckerthread.h
 DESTDIR = bin
 OBJECTS_DIR = build
 MOC_DIR = build
