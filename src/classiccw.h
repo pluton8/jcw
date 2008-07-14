@@ -12,7 +12,7 @@ Q_OBJECT
 public:
 	ClassicCW(const QDomElement& root, QWidget* parent = NULL, Qt::WindowFlags f = 0);
 	~ClassicCW();
-	enum CellState { csUndef = 0, csEmpty, csFilled };		// состояния клеток
+	enum CellState { csUndef = '_', csEmpty = '.', csFilled = '*' };		// состояния клеток
 	CellState** getField();
 	
 protected:

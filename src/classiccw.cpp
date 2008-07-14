@@ -32,11 +32,13 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	for (i = 0; i < fw; i++)
 	{
 		field[i] = new CellState[fh];
-		bzero(field[i], fh * sizeof(CellState));
+		//bzero(field[i], fh * sizeof(CellState));
+		memset(field[i], csUndef, fh * sizeof(CellState));
 	}
 	
 	QStringList list;
 	QStringList list2;
+	/*		ищем и читаем верхний заголовок		*/
 	QDomNodeList nodes = root.elementsByTagName("topheader");
 	if (!nodes.isEmpty())
 	{
@@ -57,7 +59,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 				list2 = list.at(i).split(',', QString::SkipEmptyParts);
 				for (j = 0; j < list2.size(); j++)
 				{
-					thdr[i][j] = list2.at(j).toInt(&ok);
+					totalFilled += (thdr[i][j] = list2.at(j).toInt(&ok));
 					checkOk;
 				}
 			}
@@ -66,6 +68,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	else
 		setDeleting;
 	
+	/*		ищем и читаем левый заголовок		*/
 	nodes = root.elementsByTagName("leftheader");
 	if (!nodes.isEmpty())
 	{
@@ -99,6 +102,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	else
 		setDeleting;
 	
+	/*		ищем и читаем состояния клеток поля		*/
 	nodes = root.elementsByTagName("field");
 	if (!nodes.isEmpty())
 	{
@@ -112,7 +116,14 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 				checkOk;
 				quint16 y = nodes.item(i).toElement().attribute("row").toUInt(&ok);
 				checkOk;
-				field[x][y] = nodes.item(i).toElement().attribute("state") == "filled" ? csFilled : csEmpty;
+				QString state = nodes.item(i).toElement().attribute("state");
+				if (state  == "filled")
+				{
+					field[x][y] = csFilled;
+					numFilled++;
+				}
+				else if (state  == "empty")
+					field[x][y] = csEmpty;
 			}
 		}
 	}
@@ -135,6 +146,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	/*show();
 	setFocus(Qt::TabFocusReason);		// <<< не работает
 	qDebug() << qApp->focusWidget();*/
+	//emit progressChanged(numFilled * 100 / totalFilled);
 }
 
 ClassicCW::~ClassicCW()
@@ -471,8 +483,24 @@ void ClassicCW::changeCellState(CellState newState)
 	quint16 fieldX = fX - lw;
 	quint16 fieldY = fY - th;
 	if (fX >= lw && fX < fw + lw && fY >= th && fY < th + fh)	// если попали на поле
+	{
+		if (field[fieldX][fieldY] == csFilled)
+		{
+			if (newState != csFilled)
+				numFilled--;
+		}
+		else
+		{
+			if (newState == csFilled)
+				numFilled++;
+		}	
+		emit progressChanged(numFilled * 100 / totalFilled);
 		field[fieldX][fieldY] = newState;
+		// надо запустить чекалку поля
+		emit cellStateChanged(fieldX, fieldY);
+	}
 	else if (fX < lw && fY >= th && fY < fh + th)	// если попали в левый заголовок
+
 		lhdr[fX][fieldY] *= -1;
 		/*field[fX][fieldY] *= -1;
 		src/classiccw.cpp:266: error: no match for 'operator*=' in '*((*(((ClassicCW*)this)->ClassicCW::field + ((ClassicCW::CellState**)(((unsigned int)((ClassicCW*)this)->ClassicCW::fX) * 4u)))) + ((ClassicCW::CellState*)(((unsigned int)fieldY) * 4u))) *= -0x000000000000001'
@@ -480,9 +508,6 @@ void ClassicCW::changeCellState(CellState newState)
 		*/
 	else if (fX >= lw && fX < lw + fw && fY < th)	// если попали в верхний заголовок
 		thdr[fieldX][th - fY - 1] *= -1;
-	
-	// надо запустить чекалку поля
-	emit cellStateChanged();
 }
 
 void ClassicCW::clearField()
@@ -500,6 +525,8 @@ void ClassicCW::clearField()
 		for (j = 0; j < fh; j++)
 			lhdr[i][j] = qAbs(lhdr[i][j]);
 	update();
+	numFilled = 0;
+	emit progressChanged(0);
 }
 
 ClassicCW::CellState** ClassicCW::getField()

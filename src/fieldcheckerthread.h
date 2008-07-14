@@ -16,10 +16,9 @@ public:
 	void run();
 	enum CrosswordType { ctNone, ctClassic };
 	void setCrossword(AbstractCrossword* crossword, CrosswordType cwType);
-	void setResultLabel(QLabel* resultLabel);
 	
 public slots:
-	void check();
+	void check(quint16 fX, quint16 fY);
 	
 protected:
 	AbstractCrossword*	crossword;
@@ -28,10 +27,10 @@ protected:
 	quint16				fh;
 	quint16				th;
 	quint16				lw;
-	QLabel*				resultLabel;
 	
 signals:
 	void solved();
+	void resultTextChanged(QString);
 };
 
 #endif

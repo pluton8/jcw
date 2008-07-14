@@ -7,6 +7,7 @@ AbstractCrossword::AbstractCrossword(QWidget* parent, Qt::WindowFlags f)
 	margin = 20;
 	needDelete = false;
 	ciDialog = NULL;
+	totalFilled = numFilled = 0;
 }
 
 bool AbstractCrossword::isNeedDelete() const

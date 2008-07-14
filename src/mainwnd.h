@@ -18,11 +18,14 @@ protected:
 	QScrollArea*		scrollArea;
 	AbstractCrossword*	crossword;
 	//QWidget*			centralWidget;
+	
 	QMenuBar*			menuBar;
 	QMenu*				menu;
 	QToolBar*			toolBar;
 	QStatusBar*			statusBar;
 	QLabel*				checkResultLabel;
+	QProgressBar*		solveProgress;
+	
 	//QAction*			action;
 	QAction*			openCWAction;
 	QAction*			showInfoAction;

@@ -30,10 +30,13 @@ protected:
 	QString			date;						// дата создания
 	QString			comment;					// юзерский коммент
 	CrosswordInfo*	ciDialog;					// указатель на диалог инфо
+	quint16			numFilled;					// колво закрашенных клеток
+	quint16			totalFilled;				// необходимое колво закрашенных клеток
 	static const quint16 MIN_CELLSIZE = 10;		// минимальный размер клетки
 	
 signals:
-	void cellStateChanged();
+	void cellStateChanged(quint16, quint16);
+	void progressChanged(int);
 };
 
 #endif

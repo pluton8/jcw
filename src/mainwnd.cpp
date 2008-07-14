@@ -59,6 +59,9 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	/*		добавляем статусбар		*/
 	statusBar = new QStatusBar(this);
 	//statusBar->showMessage("hello, world!");
+	solveProgress = new QProgressBar(statusBar);
+	//solveProgress->resize(10, solveProgress->height());
+	statusBar->addWidget(solveProgress);
 	checkResultLabel = new QLabel("---", statusBar);
 	statusBar->addWidget(checkResultLabel);
 	this->setStatusBar(statusBar);
@@ -79,7 +82,8 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	
 	//cwType = ctNone;
 	fieldChecker.start();
-	fieldChecker.setResultLabel(checkResultLabel);
+	connect(&fieldChecker, SIGNAL(resultTextChanged(QString)), checkResultLabel, SLOT(setText(QString)));
+	//fieldChecker.setResultLabel(checkResultLabel);
 	//connect(this, SIGNAL(cellStateChanged()), &fieldChecker, SLOT(check()));
 	
 	/*	убрать это потом:	*/
@@ -95,6 +99,8 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
 	connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
 	connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
+	solveProgress->setValue(0);
+	connect(crossword, SIGNAL(progressChanged(int)), solveProgress, SLOT(setValue(int)));
 }
 
 MainWnd::~MainWnd()
@@ -160,6 +166,8 @@ void MainWnd::openCrossword()
 					fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
 					connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
 					connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
+					solveProgress->setValue(0);
+					connect(crossword, SIGNAL(progressChanged(int)), solveProgress, SLOT(setValue(int)));
 				}
 			}
 			else
