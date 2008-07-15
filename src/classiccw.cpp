@@ -1,3 +1,22 @@
+/**********************************************************************************
+ *  jcw - this is a environment for solving japan crosswords by users on computer *
+ *  Copyright (C) 2008 by pluton <plutonpluton@mail.ru>                           *
+ *                                                                                *
+ *  This program is free software; you can redistribute it and/or modify          *
+ *  it under the terms of the GNU General Public License as published by          *
+ *  the Free Software Foundation; either version 2 of the License, or             *
+ *  (at your option) any later version.                                           *
+ *                                                                                *
+ *  This program is distributed in the hope that it will be useful,               *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+ *  GNU General Public License for more details.                                  *
+ *                                                                                *
+ *  You should have received a copy of the GNU General Public License along       *
+ *  with this program; if not, write to the Free Software Foundation, Inc.,       *
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                   *
+ *********************************************************************************/
+
 #include "classiccw.h"
 
 // макрос, устанавливающий флаг ошибки
@@ -32,8 +51,8 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	for (i = 0; i < fw; i++)
 	{
 		field[i] = new CellState[fh];
-		//bzero(field[i], fh * sizeof(CellState));
-		memset(field[i], csUndef, fh * sizeof(CellState));
+		bzero(field[i], fh * sizeof(CellState));
+		//memset(field[i], csUndef, fh * sizeof(CellState));
 	}
 	
 	QStringList list;
@@ -59,7 +78,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 				list2 = list.at(i).split(',', QString::SkipEmptyParts);
 				for (j = 0; j < list2.size(); j++)
 				{
-					totalFilled += (thdr[i][j] = list2.at(j).toInt(&ok));
+					thdr[i][j] = list2.at(j).toInt(&ok);
 					checkOk;
 				}
 			}
@@ -67,6 +86,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	}
 	else
 		setDeleting;
+	colsRes = new QBitArray(fw);
 	
 	/*		ищем и читаем левый заголовок		*/
 	nodes = root.elementsByTagName("leftheader");
@@ -101,6 +121,7 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	}
 	else
 		setDeleting;
+	rowsRes = new QBitArray(fh);
 	
 	/*		ищем и читаем состояния клеток поля		*/
 	nodes = root.elementsByTagName("field");
@@ -118,10 +139,10 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 				checkOk;
 				QString state = nodes.item(i).toElement().attribute("state");
 				if (state  == "filled")
-				{
+				//{
 					field[x][y] = csFilled;
-					numFilled++;
-				}
+					//numFilled++;
+				//}
 				else if (state  == "empty")
 					field[x][y] = csEmpty;
 			}
@@ -146,13 +167,14 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	/*show();
 	setFocus(Qt::TabFocusReason);		// <<< не работает
 	qDebug() << qApp->focusWidget();*/
-	//emit progressChanged(numFilled * 100 / totalFilled);
 }
 
 ClassicCW::~ClassicCW()
 {
 	// ^^^ надо бы удалить всё, что мы тама создали
 	quint16 i;
+	if (rowsRes != NULL)
+		delete rowsRes;
 	if (lhdr != NULL)
 	{
 		for (i = 0; i < lw; i++)
@@ -160,6 +182,8 @@ ClassicCW::~ClassicCW()
 				delete[] lhdr[i];
 		delete[] lhdr;
 	}
+	if (colsRes != NULL)
+		delete colsRes;
 	if (thdr != NULL)
 	{
 		for (i = 0; i < fw; i++)
@@ -484,17 +508,8 @@ void ClassicCW::changeCellState(CellState newState)
 	quint16 fieldY = fY - th;
 	if (fX >= lw && fX < fw + lw && fY >= th && fY < th + fh)	// если попали на поле
 	{
-		if (field[fieldX][fieldY] == csFilled)
-		{
-			if (newState != csFilled)
-				numFilled--;
-		}
-		else
-		{
-			if (newState == csFilled)
-				numFilled++;
-		}	
-		emit progressChanged(numFilled * 100 / totalFilled);
+		if (field[fieldX][fieldY] != csUndef && field[fieldX][fieldY] != newState)
+			numCorrections++;
 		field[fieldX][fieldY] = newState;
 		// надо запустить чекалку поля
 		emit cellStateChanged(fieldX, fieldY);
@@ -525,8 +540,6 @@ void ClassicCW::clearField()
 		for (j = 0; j < fh; j++)
 			lhdr[i][j] = qAbs(lhdr[i][j]);
 	update();
-	numFilled = 0;
-	emit progressChanged(0);
 }
 
 ClassicCW::CellState** ClassicCW::getField()

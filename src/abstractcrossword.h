@@ -1,13 +1,29 @@
+/**********************************************************************************
+ *  jcw - this is a environment for solving japan crosswords by users on computer *
+ *  Copyright (C) 2008 by pluton <plutonpluton@mail.ru>                           *
+ *                                                                                *
+ *  This program is free software; you can redistribute it and/or modify          *
+ *  it under the terms of the GNU General Public License as published by          *
+ *  the Free Software Foundation; either version 2 of the License, or             *
+ *  (at your option) any later version.                                           *
+ *                                                                                *
+ *  This program is distributed in the hope that it will be useful,               *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+ *  GNU General Public License for more details.                                  *
+ *                                                                                *
+ *  You should have received a copy of the GNU General Public License along       *
+ *  with this program; if not, write to the Free Software Foundation, Inc.,       *
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                   *
+ *********************************************************************************/
+
 #ifndef ABSTRACTCROSSWORD_H
 #define ABSTRACTCROSSWORD_H
 
 #include <QtGui>
 #include "crosswordinfo.h"
-//#include "fieldcheckerthread.h"
 
-//class FieldCheckerThread;
-
-class AbstractCrossword : public QWidget//QGraphicsView//
+class AbstractCrossword : public QWidget
 {
 Q_OBJECT
 
@@ -16,6 +32,7 @@ public:
 	//enum CellState { csUndef = 0 };			// возможные состояния клеток
 	bool isNeedDelete() const;					// возвращает флаг ошибки
 	QString getName() const;					// возвращает название кроссворда
+	quint16 getNumCorrections();
 	
 public slots:
 	void showInfo();							// показ диалога с инфой
@@ -30,13 +47,11 @@ protected:
 	QString			date;						// дата создания
 	QString			comment;					// юзерский коммент
 	CrosswordInfo*	ciDialog;					// указатель на диалог инфо
-	quint16			numFilled;					// колво закрашенных клеток
-	quint16			totalFilled;				// необходимое колво закрашенных клеток
+	quint16			numCorrections;				// количество исправлений при решении
 	static const quint16 MIN_CELLSIZE = 10;		// минимальный размер клетки
 	
 signals:
 	void cellStateChanged(quint16, quint16);
-	void progressChanged(int);
 };
 
 #endif

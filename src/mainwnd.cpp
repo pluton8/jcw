@@ -1,3 +1,22 @@
+/**********************************************************************************
+ *  jcw - this is a environment for solving japan crosswords by users on computer *
+ *  Copyright (C) 2008 by pluton <plutonpluton@mail.ru>                           *
+ *                                                                                *
+ *  This program is free software; you can redistribute it and/or modify          *
+ *  it under the terms of the GNU General Public License as published by          *
+ *  the Free Software Foundation; either version 2 of the License, or             *
+ *  (at your option) any later version.                                           *
+ *                                                                                *
+ *  This program is distributed in the hope that it will be useful,               *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of                *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+ *  GNU General Public License for more details.                                  *
+ *                                                                                *
+ *  You should have received a copy of the GNU General Public License along       *
+ *  with this program; if not, write to the Free Software Foundation, Inc.,       *
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                   *
+ *********************************************************************************/
+
 #include "mainwnd.h"
 
 MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
@@ -64,6 +83,8 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	statusBar->addWidget(solveProgress);
 	checkResultLabel = new QLabel("---", statusBar);
 	statusBar->addWidget(checkResultLabel);
+	solvingTimeLabel = new QLabel(statusBar);
+	statusBar->addWidget(solvingTimeLabel);
 	this->setStatusBar(statusBar);
 	
 	/*		добавляем виджеты		*/
@@ -87,7 +108,7 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	//connect(this, SIGNAL(cellStateChanged()), &fieldChecker, SLOT(check()));
 	
 	/*	убрать это потом:	*/
-	QFile file("newchannel.jcw");
+	/*QFile file("newchannel.jcw");
 	QDomDocument domDoc;
 	domDoc.setContent(&file);
 	crossword = new ClassicCW(domDoc.documentElement());
@@ -97,10 +118,11 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	if (!crossword->getName().isEmpty())
 		setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
 	fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
+	connect(&fieldChecker, SIGNAL(solved()), this, SLOT(solved()));
 	connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
 	connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
 	solveProgress->setValue(0);
-	connect(crossword, SIGNAL(progressChanged(int)), solveProgress, SLOT(setValue(int)));
+	connect(crossword, SIGNAL(progressChanged(int)), solveProgress, SLOT(setValue(int)));*/
 }
 
 MainWnd::~MainWnd()
@@ -164,10 +186,16 @@ void MainWnd::openCrossword()
 					if (!crossword->getName().isEmpty())
 						setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
 					fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
+					connect(&fieldChecker, SIGNAL(solved()), this, SLOT(solved()));
 					connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
 					connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
 					solveProgress->setValue(0);
-					connect(crossword, SIGNAL(progressChanged(int)), solveProgress, SLOT(setValue(int)));
+					connect(&fieldChecker, SIGNAL(progressChanged(int)), solveProgress, SLOT(setValue(int)));
+					solvingTimer = new QTimer(crossword);
+					solvingTimer->setInterval(1000);
+					connect(solvingTimer, SIGNAL(timeout()), this, SLOT(solvingTimerTimeout()));
+					solvingTimer->start();
+					solvingTime.setHMS(0, 0, 0);
 				}
 			}
 			else
@@ -177,4 +205,18 @@ void MainWnd::openCrossword()
 	}
 	
 	file.close();
+}
+
+void MainWnd::solved()
+{
+	solvingTimer->stop();
+	QMessageBox::information(this, trUtf8("Crossword solved"), QString(trUtf8(
+			"You win!\nCongratulations and blah-blah-blah\nElapsed time to solving: %1\nCorrections count: %2").
+			arg(solvingTime.toString("H:mm:ss")).arg(crossword->getNumCorrections())));
+}
+
+void MainWnd::solvingTimerTimeout()
+{
+	solvingTime = solvingTime.addSecs(1);
+	solvingTimeLabel->setText(QString(trUtf8("Elapsed time: %1")).arg(solvingTime.toString("H:mm:ss")));
 }
