@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 	<qresource>
 		<file>pics/fileopen.png</file>
+		<file>pics/filesave.png</file>
 		<file>pics/quit.png</file>
 	</qresource>
 </RCC>

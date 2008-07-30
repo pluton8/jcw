@@ -32,7 +32,9 @@ public:
 	//enum CellState { csUndef = 0 };			// возможные состояния клеток
 	bool isNeedDelete() const;					// возвращает флаг ошибки
 	QString getName() const;					// возвращает название кроссворда
-	quint16 getNumCorrections();
+	quint16 getNumCorrections();				// вернуть колво исправлений
+	void solved();								// кроссворд решён
+	virtual void save(QFile* file);				// сохранить
 	
 public slots:
 	void showInfo();							// показ диалога с инфой
@@ -48,6 +50,7 @@ protected:
 	QString			comment;					// юзерский коммент
 	CrosswordInfo*	ciDialog;					// указатель на диалог инфо
 	quint16			numCorrections;				// количество исправлений при решении
+	bool			isSolved;					// признак решённости кроссворда
 	static const quint16 MIN_CELLSIZE = 10;		// минимальный размер клетки
 	
 signals:

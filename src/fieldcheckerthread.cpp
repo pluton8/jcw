@@ -43,18 +43,8 @@ void FieldCheckerThread::run()
 
 void FieldCheckerThread::check(quint16 fX, quint16 fY)
 {
-	/*		так как я ничё лучше не придумал, то проверка осуществляется следующим образом:
-			изменённая строка и столбец преобразуются в текстовый эквивалент, потом
-			составляется регэксп по соответствующим заголовкам, строки проверяются по
-			этим регэкспам. странно оно, конечно, работает :))))
-			у кого будут мысли получше - пишите		*/
-	//qDebug() << "check";
 	if (cwType == ctClassic)
 	{
-		ClassicCW::CellState** field = ((ClassicCW*) crossword)->getField();
-		QBitArray* rowsRes = ((RectCrossword*) crossword)->getRowsRes();
-		QBitArray* colsRes = ((RectCrossword*) crossword)->getColsRes();
-		
 		/*		преобразовываем строку поля в текст		*/
 		QString row(fw, '_');
 		quint16 i;
@@ -77,19 +67,13 @@ void FieldCheckerThread::check(quint16 fX, quint16 fY)
 		for (i = 0; i < lw; i++)
 		{
 			quint16 num = qAbs(lhdr[lw - i - 1][fY]);
-			//qDebug() << num;
 			if (num == 0)					// останавливаемся на нуле
 				break;
 			if (i != 0)						// каждый раз, кроме первого, добавляем разделитель блоков
 				rowPattern.append("[_.]+");
-			/*if (num == 1)					// если число == 1, то добавляем * с повтором 1 раз
-				rowPattern.append("\\*+");
-			else							// иначе добавляем * с повтором 1...num раз
-				rowPattern.append(QString("\\*{0,%1}").arg(num));*/
 			rowPattern.append(QString("\\*{%1}").arg(num));
 		}
 		rowPattern.append("[_.]*$");		// <- конец регэкспа
-		//qDebug() << pattern;
 		
 		/*		преобразовываем столбец поля в текст		*/
 		QString col(fh, '_');
@@ -106,7 +90,6 @@ void FieldCheckerThread::check(quint16 fX, quint16 fY)
 					col[i] = '*';
 					break;
 			}
-		//qDebug() << col;
 		
 		QString colPattern("^[_.]*");
 		for (i = 0; i < th; i++)
@@ -116,14 +99,9 @@ void FieldCheckerThread::check(quint16 fX, quint16 fY)
 				break;
 			if (i != 0)
 				colPattern.append("[_.]+");
-			/*if (num == 1)
-				colPattern.append("\\*+");
-			else
-				colPattern.append(QString("\\*{0,%1}").arg(num));*/
 			colPattern.append(QString("\\*{%1}").arg(num));
 		}
 		colPattern.append("[_.]*$");		// <- конец регэкспа
-		//qDebug() << colPattern;
 		
 		rowsRes->setBit(fY, row.contains(QRegExp(rowPattern)));
 		colsRes->setBit(fX, col.contains(QRegExp(colPattern)));
@@ -163,4 +141,7 @@ void FieldCheckerThread::setCrossword(AbstractCrossword* crossword, CrosswordTyp
 	((RectCrossword*) crossword)->sizes(&fw, &fh, &th, &lw);
 	thdr = ((ClassicCW*) crossword)->getThdr();
 	lhdr = ((ClassicCW*) crossword)->getLhdr();
+	field = ((ClassicCW*) crossword)->getField();
+	rowsRes = ((RectCrossword*) crossword)->getRowsRes();
+	colsRes = ((RectCrossword*) crossword)->getColsRes();
 }

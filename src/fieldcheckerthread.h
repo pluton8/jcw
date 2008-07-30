@@ -40,14 +40,17 @@ public slots:
 	void check(quint16 fX, quint16 fY);
 	
 protected:
-	AbstractCrossword*	crossword;
-	CrosswordType		cwType;
-	quint16				fw;
-	quint16				fh;
-	quint16				th;
-	quint16				lw;
-	qint16**			thdr;
-	qint16**			lhdr;
+	AbstractCrossword*		crossword;
+	CrosswordType			cwType;
+	ClassicCW::CellState**	field;
+	QBitArray*				rowsRes;
+	QBitArray*				colsRes;
+	quint16					fw;
+	quint16					fh;
+	quint16					th;
+	quint16					lw;
+	qint16**				thdr;
+	qint16**				lhdr;
 	
 signals:
 	void solved();

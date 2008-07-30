@@ -24,7 +24,7 @@ AbstractCrossword::AbstractCrossword(QWidget* parent, Qt::WindowFlags f)
 {
 	cellSize = 20;
 	margin = 20;
-	needDelete = false;
+	needDelete = isSolved = false;
 	ciDialog = NULL;
 	numCorrections = 0;
 }
@@ -53,4 +53,13 @@ void AbstractCrossword::clearField()
 quint16 AbstractCrossword::getNumCorrections()
 {
 	return numCorrections;
+}
+
+void AbstractCrossword::solved()
+{
+	isSolved = true;
+}
+
+void AbstractCrossword::save(QFile*/* file*/)
+{
 }

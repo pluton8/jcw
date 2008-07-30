@@ -50,6 +50,7 @@ protected:
 	
 	//QAction*			action;
 	QAction*			openCWAction;
+	QAction*			saveCWAction;
 	QAction*			showInfoAction;
 	QAction*			quitAction;
 	QAction*			aboutAction;
@@ -61,6 +62,7 @@ protected slots:
 	void openCrossword();			// открыть кроссворд
 	void solved();					// кроссворд решён
 	void solvingTimerTimeout();		// обновить время решения
+	void saveCrossword();			// сохранить кроссворд
 };
 
 #endif

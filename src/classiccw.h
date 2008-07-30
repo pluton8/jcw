@@ -34,6 +34,7 @@ public:
 	//enum CellState { csUndef = '_', csEmpty = '.', csFilled = '*' };		// состояния клеток
 	enum CellState { csUndef = 0, csEmpty, csFilled };		// состояния клеток
 	CellState** getField();
+	void save(QFile* file);
 	
 protected:
 	CellState**	field;				// поле

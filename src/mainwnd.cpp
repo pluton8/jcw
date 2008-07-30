@@ -45,7 +45,15 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	menu->addAction(openCWAction);
 	toolBar->addAction(openCWAction);
 	
-	showInfoAction = new QAction(trUtf8("&Show info..."), menu);		// показать инфу о кроссворде
+	saveCWAction = new QAction(trUtf8("&Save crossword..."), menu);		// сохранить файл
+	saveCWAction->setShortcut(Qt::CTRL + Qt::Key_S);
+	saveCWAction->setIcon(QIcon(":/pics/filesave.png"));
+	saveCWAction->setEnabled(false);
+	connect(saveCWAction, SIGNAL(triggered()), this, SLOT(saveCrossword()));
+	menu->addAction(saveCWAction);
+	toolBar->addAction(saveCWAction);
+	
+	showInfoAction = new QAction(trUtf8("Show &info..."), menu);		// показать инфу о кроссворде
 	showInfoAction->setShortcut(Qt::CTRL + Qt::Key_I);
 	showInfoAction->setEnabled(false);
 	//connect(showInfoAction, SIGNAL(triggered()), this, SLOT(showInfo()));
@@ -54,6 +62,7 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	
 	clearFieldAction = new QAction(trUtf8("&Clear field"), menu);		// очистка поля
 	clearFieldAction->setShortcut(Qt::CTRL + Qt::Key_C);
+	clearFieldAction->setEnabled(false);
 	//connect(clearFieldAction, SIGNAL(triggered()), this, SLOT(clearField()));
 	menu->addAction(clearFieldAction);
 	toolBar->addAction(clearFieldAction);
@@ -183,6 +192,8 @@ void MainWnd::openCrossword()
 					crossword->setGeometry(3, 3, 695, 495);
 					scrollArea->setWidget(crossword);
 					showInfoAction->setEnabled(true);
+					clearFieldAction->setEnabled(true);
+					saveCWAction->setEnabled(true);
 					if (!crossword->getName().isEmpty())
 						setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
 					fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
@@ -213,10 +224,31 @@ void MainWnd::solved()
 	QMessageBox::information(this, trUtf8("Crossword solved"), QString(trUtf8(
 			"You win!\nCongratulations and blah-blah-blah\nElapsed time to solving: %1\nCorrections count: %2").
 			arg(solvingTime.toString("H:mm:ss")).arg(crossword->getNumCorrections())));
+	crossword->solved();
+	clearFieldAction->setEnabled(false);
+	saveCWAction->setEnabled(false);
 }
 
 void MainWnd::solvingTimerTimeout()
 {
 	solvingTime = solvingTime.addSecs(1);
 	solvingTimeLabel->setText(QString(trUtf8("Elapsed time: %1")).arg(solvingTime.toString("H:mm:ss")));
+}
+
+void MainWnd::saveCrossword()
+{
+	QString fileName = QFileDialog::getSaveFileName(this, trUtf8("Save crossword"), NULL,
+			trUtf8("Crosswords (*.jcw);;All files(*)"));
+	if (fileName == NULL)					// если ничё не выбрано, то выход
+		return;
+	
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly))
+	{
+		QMessageBox::critical(this, trUtf8("Error"), trUtf8("Can't save to file"));
+		return;
+	}
+	
+	crossword->save(&file);
+	file.close();
 }

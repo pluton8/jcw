@@ -368,6 +368,8 @@ void ClassicCW::mouseMoveEvent(QMouseEvent* event)
 
 void ClassicCW::mousePressEvent(QMouseEvent* event)
 {
+	/*if (isSolved)
+		return;*/
 	calcHighlightXY(event->pos());
 	CellState newState;
 	switch (event->button())
@@ -504,6 +506,8 @@ void ClassicCW::keyReleaseEvent(QKeyEvent* event)
 
 void ClassicCW::changeCellState(CellState newState)
 {
+	if (isSolved)
+		return;
 	quint16 fieldX = fX - lw;
 	quint16 fieldY = fY - th;
 	if (fX >= lw && fX < fw + lw && fY >= th && fY < th + fh)	// если попали на поле
@@ -527,6 +531,8 @@ void ClassicCW::changeCellState(CellState newState)
 
 void ClassicCW::clearField()
 {
+	if (isSolved)
+		return;
 	quint16 i;
 	quint16 j;
 	for (i = 0; i < fw; i++)
@@ -539,10 +545,106 @@ void ClassicCW::clearField()
 	for (i = 0; i < lw; i++)
 		for (j = 0; j < fh; j++)
 			lhdr[i][j] = qAbs(lhdr[i][j]);
+	numCorrections = 0;
 	update();
 }
 
 ClassicCW::CellState** ClassicCW::getField()
 {
 	return field;
+}
+
+void ClassicCW::save(QFile* file)
+{
+	QDomDocument doc("crossword");
+	QDomElement domElem = doc.createElement("crossword");
+	
+	/*		записываем аттрибуты кроссворда:		*/
+	domElem.setAttribute("type", "classic");
+	domElem.setAttribute("ver", "0.1");
+	domElem.setAttribute("width", fw);
+	domElem.setAttribute("height", fh);
+	if (!name.isEmpty())
+		domElem.setAttribute("name", name);
+	if (!author.isEmpty())
+		domElem.setAttribute("author", author);
+	if (!date.isEmpty())
+		domElem.setAttribute("date", date);
+	if (!comment.isEmpty())
+	{
+		QDomElement elem = doc.createElement("comment");
+		elem.appendChild(doc.createTextNode(comment));
+		domElem.appendChild(elem);
+	}
+	
+	/*		записываем верхний заголовок:		*/
+	QDomElement elem = doc.createElement("topheader");
+	elem.setAttribute("height", th);
+	QString text;
+	quint16 i;
+	quint16 j;
+	for (i = 0; i < fw; i++)
+	{
+		if (i != 0)
+			text.append(';');
+		for (j = 0; j < th; j++)
+		{
+			if (thdr[i][j] == 0)
+				break;
+			if (j != 0)
+				text.append(',');
+			text.append(QString::number(thdr[i][j]));
+		}
+	}
+	elem.appendChild(doc.createTextNode(text));
+	domElem.appendChild(elem);
+	
+	/*		записываем левый заголовок:		*/
+	elem = doc.createElement("leftheader");
+	elem.setAttribute("width", lw);
+	text.clear();
+	for (i = 0; i < fh; i++)
+	{
+		if (i != 0)
+			text.append(';');
+		for (j = 0; j < lw; j++)
+		{
+			//qDebug() << lhdr[lw - j - 1][i];
+			if (lhdr[lw - j - 1][i] == 0)
+				break;
+			if (j != 0)
+				text.append(',');
+			text.append(QString::number(lhdr[lw - j - 1][i]));
+		}
+	}
+	elem.appendChild(doc.createTextNode(text));
+	domElem.appendChild(elem);
+	
+	/*		записываем состояния клеток поля, если надо:		*/
+	bool needSave = false;
+	for (i = 0; i < fw; i++)
+		for (j = 0; j < fh; j++)
+			if (field[i][j] != csUndef)
+				needSave = true;
+	if (needSave)
+	{
+		elem = doc.createElement("field");
+		for (i = 0; i < fw; i++)
+			for (j = 0; j < fh; j++)
+				if (field[i][j] != csUndef)
+				{
+					QDomElement cell = doc.createElement("cell");
+					cell.setAttribute("col", i);
+					cell.setAttribute("row", j);
+					if (field[i][j] == csFilled)
+						cell.setAttribute("state", "filled");
+					else if (field[i][j] == csEmpty)
+						cell.setAttribute("state", "empty");
+					elem.appendChild(cell);
+				}
+		domElem.appendChild(elem);
+	}
+	
+	doc.appendChild(domElem);
+	QTextStream(file) << doc.toString();
 }
