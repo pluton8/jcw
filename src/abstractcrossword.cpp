@@ -19,7 +19,7 @@
 
 #include "abstractcrossword.h"
 
-AbstractCrossword::AbstractCrossword(QWidget* parent, Qt::WindowFlags f)
+AbstractCrossword::AbstractCrossword(QTime* time, QWidget* parent, Qt::WindowFlags f)
 	: QWidget(parent, f)
 {
 	cellSize = 20;
@@ -27,6 +27,7 @@ AbstractCrossword::AbstractCrossword(QWidget* parent, Qt::WindowFlags f)
 	needDelete = isSolved = false;
 	ciDialog = NULL;
 	numCorrections = 0;
+	this->time = time;
 }
 
 bool AbstractCrossword::isNeedDelete() const
@@ -61,5 +62,9 @@ void AbstractCrossword::solved()
 }
 
 void AbstractCrossword::save(QFile*/* file*/)
+{
+}
+
+void AbstractCrossword::updateProgress()
 {
 }

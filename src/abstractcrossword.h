@@ -28,13 +28,14 @@ class AbstractCrossword : public QWidget
 Q_OBJECT
 
 public:
-    AbstractCrossword(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    AbstractCrossword(QTime* time = NULL, QWidget* parent = NULL, Qt::WindowFlags f = 0);
 	//enum CellState { csUndef = 0 };			// возможные состояния клеток
 	bool isNeedDelete() const;					// возвращает флаг ошибки
 	QString getName() const;					// возвращает название кроссворда
 	quint16 getNumCorrections();				// вернуть колво исправлений
 	void solved();								// кроссворд решён
 	virtual void save(QFile* file);				// сохранить
+	virtual void updateProgress();				// обновить прогресс решения после загрузки
 	
 public slots:
 	void showInfo();							// показ диалога с инфой
@@ -51,6 +52,7 @@ protected:
 	CrosswordInfo*	ciDialog;					// указатель на диалог инфо
 	quint16			numCorrections;				// количество исправлений при решении
 	bool			isSolved;					// признак решённости кроссворда
+	QTime*			time;						// время решения
 	static const quint16 MIN_CELLSIZE = 10;		// минимальный размер клетки
 	
 signals:

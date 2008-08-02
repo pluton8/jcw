@@ -29,7 +29,7 @@ class ClassicCW : public RectCrossword
 Q_OBJECT
 	
 public:
-	ClassicCW(const QDomElement& root, QWidget* parent = NULL, Qt::WindowFlags f = 0);
+	ClassicCW(const QDomElement& root, QTime* time, QWidget* parent = NULL, Qt::WindowFlags f = 0);
 	~ClassicCW();
 	//enum CellState { csUndef = '_', csEmpty = '.', csFilled = '*' };		// состояния клеток
 	enum CellState { csUndef = 0, csEmpty, csFilled };		// состояния клеток
@@ -57,6 +57,7 @@ protected:
 														// возвращает true, если было изменение
 	void changeCellState(CellState newState);			// изменяет состояние клетки (fX;fY) на newState
 	void clearField();									// очистка поля
+	void updateProgress();
 };
 
 #endif

@@ -30,7 +30,7 @@ class RectCrossword : public AbstractCrossword
 Q_OBJECT
 
 public:
-	RectCrossword(QWidget* parent = NULL, Qt::WindowFlags f = 0);
+	RectCrossword(QTime* time, QWidget* parent = NULL, Qt::WindowFlags f = 0);
 	//enum CellState { csUndef = 0 };			// возможные состояния клеток
 	void sizes(quint16* fw, quint16* fh, quint16* th, quint16* lw);		// возвращает размеры
 	qint16** getThdr();

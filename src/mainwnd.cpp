@@ -179,7 +179,7 @@ void MainWnd::openCrossword()
 			{
 				if (crossword != NULL)
 					delete crossword;
-				crossword = new ClassicCW(domDoc.documentElement());
+				crossword = new ClassicCW(domDoc.documentElement(), &solvingTime);
 				if (crossword->isNeedDelete())
 				{
 					QMessageBox::critical(this, trUtf8("Error"), trUtf8("Invalid values in file"));
@@ -200,13 +200,13 @@ void MainWnd::openCrossword()
 					connect(&fieldChecker, SIGNAL(solved()), this, SLOT(solved()));
 					connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
 					connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
-					solveProgress->setValue(0);
+					//solveProgress->setValue(0);
 					connect(&fieldChecker, SIGNAL(progressChanged(int)), solveProgress, SLOT(setValue(int)));
+					crossword->updateProgress();
 					solvingTimer = new QTimer(crossword);
 					solvingTimer->setInterval(1000);
 					connect(solvingTimer, SIGNAL(timeout()), this, SLOT(solvingTimerTimeout()));
 					solvingTimer->start();
-					solvingTime.setHMS(0, 0, 0);
 				}
 			}
 			else

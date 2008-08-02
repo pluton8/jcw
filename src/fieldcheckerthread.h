@@ -51,6 +51,7 @@ protected:
 	quint16					lw;
 	qint16**				thdr;
 	qint16**				lhdr;
+	void updateProgress();
 	
 signals:
 	void solved();

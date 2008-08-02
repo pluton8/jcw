@@ -31,8 +31,8 @@
 	if (!ok) \
 		setDeleting;
 
-ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f)
-	: RectCrossword(parent, f)
+ClassicCW::ClassicCW(const QDomElement& root, QTime* time, QWidget* parent, Qt::WindowFlags f)
+	: RectCrossword(time, parent, f)
 {
 	QDomElement domElem = root.toElement();
 	bool ok;
@@ -44,6 +44,15 @@ ClassicCW::ClassicCW(const QDomElement& root, QWidget* parent, Qt::WindowFlags f
 	author = domElem.attribute("author");
 	date = domElem.attribute("date");
 	//comment = domElem.attribute("comment");
+	numCorrections = domElem.attribute("corr", "0").toUInt(&ok);
+	checkOk;
+	if (this->time != NULL)
+	{
+		quint32 solvSec = domElem.attribute("time", "0").toUInt(&ok);
+		checkOk;
+		this->time->setHMS(solvSec / 3600, solvSec / 60 % 60, solvSec % 60);
+	}
+	
 	quint16 i;
 	quint16 j;
 	field = new CellState* [fw];		// создание двумерного динамического массива
@@ -547,6 +556,7 @@ void ClassicCW::clearField()
 			lhdr[i][j] = qAbs(lhdr[i][j]);
 	numCorrections = 0;
 	update();
+	emit cellStateChanged(quint16(-2), quint16(-2));
 }
 
 ClassicCW::CellState** ClassicCW::getField()
@@ -575,6 +585,13 @@ void ClassicCW::save(QFile* file)
 		QDomElement elem = doc.createElement("comment");
 		elem.appendChild(doc.createTextNode(comment));
 		domElem.appendChild(elem);
+	}
+	domElem.setAttribute("corr", numCorrections);
+	if (time != NULL)
+	{
+		// вычисляем время решения в секундах:
+		domElem.setAttribute("time", (time->hour() * 60 * 60) +
+				(time->minute() * 60) + time->second());
 	}
 	
 	/*		записываем верхний заголовок:		*/
@@ -647,4 +664,9 @@ void ClassicCW::save(QFile* file)
 	
 	doc.appendChild(domElem);
 	QTextStream(file) << doc.toString();
+}
+
+void ClassicCW::updateProgress()
+{
+	emit cellStateChanged(quint16(-1), quint16(-1));
 }
