@@ -211,125 +211,15 @@ ClassicCW::~ClassicCW()
 
 void ClassicCW::paintEvent(QPaintEvent* /*event*/)
 {
-	QPainter painter(this);			// объект QPainter для рисования
-	
-	QSize fieldSize((margin * 2) + (cellSize * (lw + fw)), (margin * 2) + (cellSize * (th + fh)));
-	QSize parentSize = parentWidget()->size();
-	resize(fieldSize.expandedTo(parentSize));
-	QPen penNormal = painter.pen();			// перо рисования границ
-	penNormal.setWidth(1);
-	QPen penBold = painter.pen();			// перо рисования жирных границ
-	penBold.setWidth(2);
-	QFont font = painter.font();
-	font.setPointSize(cellSize * 0.7);		// установка размера фонта в зависимости от размера клетки
-	painter.setFont(font);
-	quint16 i;
-	quint16 j;
-	quint16 pointX = margin + lw * cellSize;	// координаты начальной точки поля
-	quint16 pointY = margin + th * cellSize;
-	
-	/*		рисуем линии поля и цфиры		*/
-	quint16 bottomY = (fh + th) * cellSize;	// нижняя координата Y верхнего заголовка
-	quint16 rigthX = fw * cellSize;			// правая координата X верхнего заголовка
-	painter.save();
-	painter.translate(pointX, margin);
-	for (i = 0; i <= fw; i++)				// рисуем вертикальные линии
-		if (i % 5 == 0 || i == fw)			// каждую 5 границу рисуем жирнее
-		{
-			painter.setPen(penBold);
-			painter.drawLine(i * cellSize, 0, i * cellSize, bottomY);
-			painter.setPen(penNormal);
-		}
-		else
-			painter.drawLine(i * cellSize, 0, i * cellSize, bottomY);
-	
-	painter.setPen(penBold);
-	painter.drawLine(0, 0, rigthX, 0);
-	painter.setPen(penNormal);
-	for (i = 1; i < th; i++)				// рисуем горизонтальные линии
-		painter.drawLine(0, i * cellSize, rigthX, i * cellSize);
-	
-	for (i = 0; i < fw; i++)
-		for (j = 0; j < th; j++)
-			if (thdr[i][j] != 0)
-			{
-				painter.drawText(i * cellSize, (th - j - 1) * cellSize, cellSize, cellSize,
-						Qt::AlignCenter, QString::number(qAbs(thdr[i][j])));
-				if (thdr[i][j] < 0)
-					painter.drawLine((i + 1) * cellSize, (th - j - 1) * cellSize, 
-							i * cellSize, (th - j) * cellSize);
-			}
-	
-	painter.restore();
-	
-	bottomY = fh * cellSize;
-	rigthX = (fw + lw) * cellSize;
-	painter.save();
-	painter.translate(margin, pointY);
-	for (i = 0; i <= fh; i++)				// рисуем горизонтальные линии
-		if (i % 5 == 0 || i == fh)			// каждую 5 границу рисуем жирнее
-		{
-			painter.setPen(penBold);
-			painter.drawLine(0, i * cellSize, rigthX, i * cellSize);
-			painter.setPen(penNormal);
-		}
-		else
-			painter.drawLine(0, i * cellSize, rigthX, i * cellSize);
-	
-	painter.setPen(penBold);
-	painter.drawLine(0, 0, 0, bottomY);
-	painter.setPen(penNormal);
-	for (i = 1; i < lw; i++)				// рисуем вертикальные линии
-		painter.drawLine(i * cellSize, 0, i * cellSize, bottomY);
-	
-	for (i = 0; i < fh; i++)
-		for (j = 0; j < lw; j++)
-			if (lhdr[j][i] != 0)
-			{
-				painter.drawText(j * cellSize, i * cellSize, cellSize, cellSize,
-						Qt::AlignCenter, QString::number(qAbs(lhdr[j][i])));
-				if (lhdr[j][i] < 0)
-					painter.drawLine((j + 1) * cellSize, i * cellSize,
-							j * cellSize, (i + 1) * cellSize);
-			}
-	
-	painter.restore();
-	
-	painter.save();
-	painter.translate(pointX, pointY);
-	painter.setBrush(Qt::SolidPattern);
-	int pointRadius = cellSize * 0.1;
-	for (i = 0; i < fw; i++)
-		for (j = 0; j < fh; j++)
-			switch (field[i][j])
-			{
-				case csFilled:
-					painter.drawRect(i * cellSize, j * cellSize, cellSize, cellSize);
-					break;
-				case csEmpty:
-					painter.drawEllipse((i + 0.5) * cellSize - pointRadius, (j + 0.5) * cellSize -
-							pointRadius, pointRadius * 2, pointRadius * 2);
-					break;
-				/*case csUndef:
-					break;*/
-			}
-	painter.restore();
-	
-	/*		рисуем размеры поля		*/
-	font.setPointSize(cellSize * 1.2);
-	painter.setFont(font);
-	painter.drawText(margin, margin, lw * cellSize, th * cellSize, Qt::AlignCenter,
-			QString("%1x%2").arg(fw).arg(fh));
-	
-	painter.setPen(Qt::red);
-	painter.drawRect(margin + fX * cellSize, margin + fY * cellSize, cellSize, cellSize);
+	QStylePainter painter(this);			// объект для рисования
+	painter.drawPixmap(0, 0, pixmap);
 	
 	if (hasFocus())
 	{
 		QStyleOptionFocusRect option;
 		option.initFrom(this);
 		//option.backgroundColor = palette().light().color();
-		style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
+		painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
 	}
 }
 
@@ -347,7 +237,7 @@ bool ClassicCW::calcHighlightXY(const QPoint& originPoint)
 	else if (fX != oldFX || fY != oldFY)
 	{
 		changed = true;
-		update();
+		updatePixmap();
 		oldFX = fX;
 		oldFY = fY;
 	}
@@ -395,7 +285,7 @@ void ClassicCW::mousePressEvent(QMouseEvent* event)
 	}
 	changeCellState(newState);
 	event->accept();
-	update();
+	updatePixmap();
 }
 
 void ClassicCW::wheelEvent(QWheelEvent* event)
@@ -420,7 +310,7 @@ void ClassicCW::wheelEvent(QWheelEvent* event)
 		event->setAccepted(false);
 		return;
 	}
-	update();
+	updatePixmap();
 	calcHighlightXY(event->pos());
 	event->setAccepted(true);
 	return;
@@ -491,7 +381,7 @@ void ClassicCW::keyPressEvent(QKeyEvent* event)
 			QWidget::keyPressEvent(event);
 			return;
 	}
-	update();
+	updatePixmap();
 }
 
 void ClassicCW::keyReleaseEvent(QKeyEvent* event)
@@ -555,7 +445,7 @@ void ClassicCW::clearField()
 		for (j = 0; j < fh; j++)
 			lhdr[i][j] = qAbs(lhdr[i][j]);
 	numCorrections = 0;
-	update();
+	updatePixmap();
 	emit cellStateChanged(quint16(-2), quint16(-2));
 }
 
@@ -669,4 +559,132 @@ void ClassicCW::save(QFile* file)
 void ClassicCW::updateProgress()
 {
 	emit cellStateChanged(quint16(-1), quint16(-1));
+	updatePixmap();
+}
+
+void ClassicCW::updatePixmap()
+{
+	QSize fieldSize((margin * 2) + (cellSize * (lw + fw)), (margin * 2) + (cellSize * (th + fh)));
+	QSize parentSize = parentWidget()->size();
+	resize(fieldSize.expandedTo(parentSize));
+	
+	pixmap = QPixmap(size());
+	pixmap.fill(this, 0, 0);
+	QPainter painter(&pixmap);
+	painter.initFrom(this);
+	
+	QPen penNormal = painter.pen();			// перо рисования границ
+	penNormal.setWidth(1);
+	QPen penBold = painter.pen();			// перо рисования жирных границ
+	penBold.setWidth(2);
+	QFont font = painter.font();
+	font.setPointSize(cellSize * 0.7);		// установка размера фонта в зависимости от размера клетки
+	painter.setFont(font);
+	
+	quint16 i;
+	quint16 j;
+	quint16 pointX = margin + lw * cellSize;	// координаты начальной точки поля
+	quint16 pointY = margin + th * cellSize;
+	
+	/*		рисуем линии поля и цфиры		*/
+	quint16 bottomY = (fh + th) * cellSize;	// нижняя координата Y верхнего заголовка
+	quint16 rigthX = fw * cellSize;			// правая координата X верхнего заголовка
+	painter.save();
+	painter.translate(pointX, margin);
+	for (i = 0; i <= fw; i++)				// рисуем вертикальные линии
+		if (i % 5 == 0 || i == fw)			// каждую 5 границу рисуем жирнее
+		{
+			painter.setPen(penBold);
+			painter.drawLine(i * cellSize, 0, i * cellSize, bottomY);
+			painter.setPen(penNormal);
+		}
+		else
+			painter.drawLine(i * cellSize, 0, i * cellSize, bottomY);
+	
+	painter.setPen(penBold);
+	painter.drawLine(0, 0, rigthX, 0);
+	painter.setPen(penNormal);
+	for (i = 1; i < th; i++)				// рисуем горизонтальные линии
+		painter.drawLine(0, i * cellSize, rigthX, i * cellSize);
+	
+	for (i = 0; i < fw; i++)
+		for (j = 0; j < th; j++)
+			if (thdr[i][j] != 0)
+			{
+				painter.drawText(i * cellSize, (th - j - 1) * cellSize, cellSize, cellSize,
+						Qt::AlignCenter, QString::number(qAbs(thdr[i][j])));
+				if (thdr[i][j] < 0)
+					painter.drawLine((i + 1) * cellSize, (th - j - 1) * cellSize, 
+							i * cellSize, (th - j) * cellSize);
+			}
+	painter.restore();
+	
+	bottomY = fh * cellSize;
+	rigthX = (fw + lw) * cellSize;
+	painter.save();
+	painter.translate(margin, pointY);
+	for (i = 0; i <= fh; i++)				// рисуем горизонтальные линии
+		if (i % 5 == 0 || i == fh)			// каждую 5 границу рисуем жирнее
+		{
+			painter.setPen(penBold);
+			painter.drawLine(0, i * cellSize, rigthX, i * cellSize);
+			painter.setPen(penNormal);
+		}
+		else
+			painter.drawLine(0, i * cellSize, rigthX, i * cellSize);
+	
+	painter.setPen(penBold);
+	painter.drawLine(0, 0, 0, bottomY);
+	painter.setPen(penNormal);
+	for (i = 1; i < lw; i++)				// рисуем вертикальные линии
+		painter.drawLine(i * cellSize, 0, i * cellSize, bottomY);
+	
+	for (i = 0; i < fh; i++)
+		for (j = 0; j < lw; j++)
+			if (lhdr[j][i] != 0)
+			{
+				painter.drawText(j * cellSize, i * cellSize, cellSize, cellSize,
+						Qt::AlignCenter, QString::number(qAbs(lhdr[j][i])));
+				if (lhdr[j][i] < 0)
+					painter.drawLine((j + 1) * cellSize, i * cellSize,
+							j * cellSize, (i + 1) * cellSize);
+			}
+	painter.restore();
+	
+	painter.save();
+	painter.translate(pointX, pointY);
+	painter.setBrush(Qt::SolidPattern);
+	int pointRadius = cellSize * 0.1;
+	for (i = 0; i < fw; i++)
+		for (j = 0; j < fh; j++)
+		{
+			if (colsRes->at(i) || rowsRes->at(j))
+				painter.setBrush(Qt::green);
+			switch (field[i][j])
+			{
+				case csFilled:
+					painter.drawRect(i * cellSize, j * cellSize, cellSize, cellSize);
+					break;
+				case csEmpty:
+					painter.drawEllipse((i + 0.5) * cellSize - pointRadius, (j + 0.5) * cellSize -
+							pointRadius, pointRadius * 2, pointRadius * 2);
+					break;
+					/*case csUndef:
+					break;*/
+			}
+			if (colsRes->at(i) || rowsRes->at(j))
+				painter.setBrush(Qt::black);
+		}
+	painter.restore();
+	
+	/*		рисуем размеры поля		*/
+	font.setPointSize(cellSize * 1.2);
+	painter.setFont(font);
+	painter.drawText(margin, margin, lw * cellSize, th * cellSize, Qt::AlignCenter,
+			QString("%1x%2").arg(fw).arg(fh));
+	
+	painter.setPen(Qt::red);
+	painter.drawRect(margin + fX * cellSize, margin + fY * cellSize, cellSize, cellSize);
+	
+	update();
 }

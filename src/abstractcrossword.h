@@ -36,6 +36,7 @@ public:
 	void solved();								// кроссворд решён
 	virtual void save(QFile* file);				// сохранить
 	virtual void updateProgress();				// обновить прогресс решения после загрузки
+	virtual void updatePixmap();				// обновить поле
 	
 public slots:
 	void showInfo();							// показ диалога с инфой
@@ -53,6 +54,7 @@ protected:
 	quint16			numCorrections;				// количество исправлений при решении
 	bool			isSolved;					// признак решённости кроссворда
 	QTime*			time;						// время решения
+	QPixmap			pixmap;						// пиксмап, на котором рисуется поле
 	static const quint16 MIN_CELLSIZE = 10;		// минимальный размер клетки
 	
 signals:

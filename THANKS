@@ -4,5 +4,5 @@
 * себе :)				за мыслю о программе и время для написания;
 
 в проекте использованы сторонние файлы:
-* quit.png (<- exit.png), fileopen.png, filesave.png из /usr/lib/qt4/demos/undo/icons
+* quit.png (<- exit.png), filenew.png, fileopen.png, filesave.png из /usr/lib/qt4/demos/undo/icons
 * LICENSE (<- http://www.gnu.org/licenses/gpl-2.0.txt)

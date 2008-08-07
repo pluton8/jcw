@@ -49,6 +49,7 @@ protected:
 	QTime				solvingTime;
 	
 	//QAction*			action;
+	QAction*			newCWAction;
 	QAction*			openCWAction;
 	QAction*			saveCWAction;
 	QAction*			showInfoAction;
@@ -63,6 +64,7 @@ protected slots:
 	void solved();					// кроссворд решён
 	void solvingTimerTimeout();		// обновить время решения
 	void saveCrossword();			// сохранить кроссворд
+	void newCrossword();
 };
 
 #endif

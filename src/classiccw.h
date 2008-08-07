@@ -35,6 +35,7 @@ public:
 	enum CellState { csUndef = 0, csEmpty, csFilled };		// состояния клеток
 	CellState** getField();
 	void save(QFile* file);
+	void updatePixmap();
 	
 protected:
 	CellState**	field;				// поле
@@ -57,7 +58,7 @@ protected:
 														// возвращает true, если было изменение
 	void changeCellState(CellState newState);			// изменяет состояние клетки (fX;fY) на newState
 	void clearField();									// очистка поля
-	void updateProgress();
+	void updateProgress();								// обновить прогресс (после загрузки файла)
 };
 
 #endif

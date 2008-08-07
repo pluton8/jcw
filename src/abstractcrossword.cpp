@@ -68,3 +68,7 @@ void AbstractCrossword::save(QFile*/* file*/)
 void AbstractCrossword::updateProgress()
 {
 }
+
+void AbstractCrossword::updatePixmap()
+{
+}

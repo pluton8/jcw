@@ -38,6 +38,13 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	menu = new QMenu(trUtf8("&File"), menuBar);
 	menuBar->addMenu(menu);
 	
+	newCWAction = new QAction(trUtf8("&New crossword..."), menu);		// создать файл
+	newCWAction->setShortcut(Qt::CTRL + Qt::Key_N);
+	newCWAction->setIcon(QIcon(":/pics/filenew.png"));
+	connect(newCWAction, SIGNAL(triggered()), this, SLOT(newCrossword()));
+	menu->addAction(newCWAction);
+	toolBar->addAction(newCWAction);
+	
 	openCWAction = new QAction(trUtf8("&Open crossword..."), menu);		// открыть файл
 	openCWAction->setShortcut(Qt::CTRL + Qt::Key_O);
 	openCWAction->setIcon(QIcon(":/pics/fileopen.png"));
@@ -79,7 +86,7 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	
 	menu = new QMenu(trUtf8("&About"), menuBar);
 	menuBar->addMenu(menu);
-	aboutAction = menu->addAction(trUtf8("About &Qt"), qApp, SLOT(aboutQt()), Qt::SHIFT + Qt::Key_F1);
+	aboutAction = menu->addAction(trUtf8("About &Qt..."), qApp, SLOT(aboutQt()), Qt::SHIFT + Qt::Key_F1);
 	
 	this->setMenuBar(menuBar);
 	this->addToolBar(Qt::TopToolBarArea, toolBar);
@@ -221,6 +228,7 @@ void MainWnd::openCrossword()
 void MainWnd::solved()
 {
 	solvingTimer->stop();
+	crossword->updatePixmap();
 	QMessageBox::information(this, trUtf8("Crossword solved"), QString(trUtf8(
 			"You win!\nCongratulations and blah-blah-blah\nElapsed time to solving: %1\nCorrections count: %2").
 			arg(solvingTime.toString("H:mm:ss")).arg(crossword->getNumCorrections())));
@@ -251,4 +259,9 @@ void MainWnd::saveCrossword()
 	
 	crossword->save(&file);
 	file.close();
+}
+
+void MainWnd::newCrossword()
+{
+	
 }
