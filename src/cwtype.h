@@ -17,43 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                   *
  *********************************************************************************/
 
-#ifndef FIELDCHECKERTHREAD_H
-#define FIELDCHECKERTHREAD_H
+#ifndef CWTYPE_H
+#define CWTYPE_H
 
-#include <QtGui>
-#include "classiccw.h"
-#include "cwtype.h"
-
-class FieldCheckerThread : public QThread
+class CWType
 {
-Q_OBJECT
-	
 public:
-	FieldCheckerThread(QWidget* parent = NULL);
-	void run();
-	void setCrossword(AbstractCrossword* crossword, CWType::CrosswordType cwType);
-	
-public slots:
-	void check(quint16 fX, quint16 fY);
-	
-protected:
-	AbstractCrossword*		crossword;
-	CWType::CrosswordType	cwType;
-	ClassicCW::CellState**	field;
-	QBitArray*				rowsRes;
-	QBitArray*				colsRes;
-	quint16					fw;
-	quint16					fh;
-	quint16					th;
-	quint16					lw;
-	qint16**				thdr;
-	qint16**				lhdr;
-	void updateProgress();
-	
-signals:
-	void solved();
-	void resultTextChanged(QString);
-	void progressChanged(int);
+	enum CrosswordType { ctNone, ctClassic };
 };
 
 #endif

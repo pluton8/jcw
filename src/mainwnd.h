@@ -24,6 +24,9 @@
 #include <QtXml>
 #include "classiccw.h"
 #include "fieldcheckerthread.h"
+#include "newcwdialog.h"
+
+enum CrosswordType { ctNone, ctClassic };
 
 class MainWnd : public QMainWindow
 {

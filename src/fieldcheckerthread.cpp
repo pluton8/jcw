@@ -22,28 +22,19 @@
 FieldCheckerThread::FieldCheckerThread(QWidget* parent)
 	: QThread(parent)
 {
-	//qDebug() << "constructor";
-	cwType = ctNone;
+	cwType = CWType::ctNone;
 	fw = fh = th = lw = 0;
 	crossword = NULL;
 }
 
-/*FieldCheckerThread::~FieldCheckerThread()
-{
-	qDebug() << "destructor";
-}
-*/
 void FieldCheckerThread::run()
 {
-	//for (int i=0;i<200000000;i++);
-	//qDebug() << "yo!";
 	//exec();
-	//check();
 }
 
 void FieldCheckerThread::check(quint16 fX, quint16 fY)
 {
-	if (cwType == ctClassic)
+	if (cwType == CWType::ctClassic)
 	{
 		if (fX == quint16(-1) && fY == quint16(-1))			// если координаты == -1, то надо обновить весь прогресс
 		{
@@ -143,7 +134,7 @@ void FieldCheckerThread::check(quint16 fX, quint16 fY)
 	}
 }
 
-void FieldCheckerThread::setCrossword(AbstractCrossword* crossword, CrosswordType cwType)
+void FieldCheckerThread::setCrossword(AbstractCrossword* crossword, CWType::CrosswordType cwType)
 {
 	//qDebug() << crossword->getName();
 	this->crossword = crossword;
@@ -160,7 +151,7 @@ void FieldCheckerThread::setCrossword(AbstractCrossword* crossword, CrosswordTyp
 
 void FieldCheckerThread::updateProgress()
 {
-	if (cwType == ctClassic)
+	if (cwType == CWType::ctClassic)
 	{
 		quint16 i;
 		quint16 j;

@@ -17,32 +17,39 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.                   *
  *********************************************************************************/
 
-#ifndef CROSSWORDINFO_H
-#define CROSSWORDINFO_H
+#ifndef NEWCWDIALOG_H
+#define NEWCWDIALOG_H
 
 #include <QtGui>
+#include "cwtype.h"
 
-class CrosswordInfo : public QDialog
+class NewCWDialog : public QDialog
 {
 Q_OBJECT
 	
 public:
-	CrosswordInfo(const QString& name = QString(), const QString& author = QString(),
-			const QString& date = QString(), const QString& comment = QString(),
-			QWidget* parent = NULL, Qt::WindowFlags f = Qt::Dialog);
-	//~CrosswordInfo();
+	NewCWDialog(QWidget* parent = NULL, Qt::WindowFlags flags =
+			Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+	CWType::CrosswordType getCWType();
+	quint16 getCWWidth();
+	quint16 getCWHeight();
+	quint16 getLWidth();
+	quint16 getTHeight();
 	
 protected:
-	QLabel*			nameLabel;
-	QLabel*			authorLabel;
-	QLabel*			dateLabel;
-	QLabel*			commentLabel;
-	QLineEdit*		nameLineEdit;
-	QLineEdit*		authorLineEdit;
-	QLineEdit*		dateLineEdit;
-	QTextEdit*		commentTextEdit;
-	QPushButton*	okPushButton;
+	QComboBox*				typeComboBox;
+	QSpinBox*				widthSpinBox;
+	QSpinBox*				heightSpinBox;
+	QRadioButton*			paintRadioButton;
+	QRadioButton*			fillRadioButton;
+	QGroupBox*				hdrGroupBox;
+	QSpinBox*				leftWidthSpinBox;
+	QSpinBox*				topHeightSpinBox;
+	CWType::CrosswordType	cwType;
 	
+	
+protected slots:
+	void radioToggled(bool checked);
 };
 
 #endif

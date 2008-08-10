@@ -21,7 +21,7 @@
 #define ABSTRACTCROSSWORD_H
 
 #include <QtGui>
-#include "crosswordinfo.h"
+#include "crosswordinfodialog.h"
 
 class AbstractCrossword : public QWidget
 {
@@ -37,7 +37,7 @@ public:
 	virtual void save(QFile* file);				// сохранить
 	virtual void updateProgress();				// обновить прогресс решения после загрузки
 	virtual void updatePixmap();				// обновить поле
-	
+
 public slots:
 	void showInfo();							// показ диалога с инфой
 	virtual void clearField();					// очистка поля
@@ -50,7 +50,7 @@ protected:
 	QString			author;						// автор
 	QString			date;						// дата создания
 	QString			comment;					// юзерский коммент
-	CrosswordInfo*	ciDialog;					// указатель на диалог инфо
+	CrosswordInfoDialog*	ciDialog;					// указатель на диалог инфо
 	quint16			numCorrections;				// количество исправлений при решении
 	bool			isSolved;					// признак решённости кроссворда
 	QTime*			time;						// время решения

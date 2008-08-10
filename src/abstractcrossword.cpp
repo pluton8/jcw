@@ -38,7 +38,7 @@ bool AbstractCrossword::isNeedDelete() const
 void AbstractCrossword::showInfo()
 {
 	if (ciDialog == NULL)
-		ciDialog = new CrosswordInfo(name, author, date, comment, this);
+		ciDialog = new CrosswordInfoDialog(name, author, date, comment, this);
 	ciDialog->show();
 }
 

@@ -41,14 +41,14 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	newCWAction = new QAction(trUtf8("&New crossword..."), menu);		// создать файл
 	newCWAction->setShortcut(Qt::CTRL + Qt::Key_N);
 	newCWAction->setIcon(QIcon(":/pics/filenew.png"));
-	connect(newCWAction, SIGNAL(triggered()), this, SLOT(newCrossword()));
+	connect(newCWAction, SIGNAL(triggered()), SLOT(newCrossword()));
 	menu->addAction(newCWAction);
 	toolBar->addAction(newCWAction);
 	
 	openCWAction = new QAction(trUtf8("&Open crossword..."), menu);		// открыть файл
 	openCWAction->setShortcut(Qt::CTRL + Qt::Key_O);
 	openCWAction->setIcon(QIcon(":/pics/fileopen.png"));
-	connect(openCWAction, SIGNAL(triggered()), this, SLOT(openCrossword()));
+	connect(openCWAction, SIGNAL(triggered()), SLOT(openCrossword()));
 	menu->addAction(openCWAction);
 	toolBar->addAction(openCWAction);
 	
@@ -56,7 +56,7 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	saveCWAction->setShortcut(Qt::CTRL + Qt::Key_S);
 	saveCWAction->setIcon(QIcon(":/pics/filesave.png"));
 	saveCWAction->setEnabled(false);
-	connect(saveCWAction, SIGNAL(triggered()), this, SLOT(saveCrossword()));
+	connect(saveCWAction, SIGNAL(triggered()), SLOT(saveCrossword()));
 	menu->addAction(saveCWAction);
 	toolBar->addAction(saveCWAction);
 	
@@ -80,7 +80,7 @@ MainWnd::MainWnd(QWidget* parent, Qt::WindowFlags f)
 	quitAction = new QAction(trUtf8("&Quit"), menu);					// выход
 	quitAction->setShortcut(Qt::ALT + Qt::Key_F4);
 	quitAction->setIcon(QIcon(":/pics/quit.png"));
-	connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+	connect(quitAction, SIGNAL(triggered()), SLOT(close()));
 	menu->addAction(quitAction);
 	toolBar->addAction(quitAction);
 	
@@ -203,8 +203,8 @@ void MainWnd::openCrossword()
 					saveCWAction->setEnabled(true);
 					if (!crossword->getName().isEmpty())
 						setWindowTitle(QString("%1 - %2").arg(*windowName).arg(crossword->getName()));
-					fieldChecker.setCrossword(crossword, FieldCheckerThread::ctClassic);
-					connect(&fieldChecker, SIGNAL(solved()), this, SLOT(solved()));
+					fieldChecker.setCrossword(crossword, CWType::ctClassic);
+					connect(&fieldChecker, SIGNAL(solved()), SLOT(solved()));
 					connect(showInfoAction, SIGNAL(triggered()), crossword, SLOT(showInfo()));
 					connect(clearFieldAction, SIGNAL(triggered()), crossword, SLOT(clearField()));
 					//solveProgress->setValue(0);
@@ -212,7 +212,7 @@ void MainWnd::openCrossword()
 					crossword->updateProgress();
 					solvingTimer = new QTimer(crossword);
 					solvingTimer->setInterval(1000);
-					connect(solvingTimer, SIGNAL(timeout()), this, SLOT(solvingTimerTimeout()));
+					connect(solvingTimer, SIGNAL(timeout()), SLOT(solvingTimerTimeout()));
 					solvingTimer->start();
 				}
 			}
@@ -263,5 +263,12 @@ void MainWnd::saveCrossword()
 
 void MainWnd::newCrossword()
 {
-	
+	NewCWDialog* newDialog = new NewCWDialog(this);
+	if (newDialog->exec() != QDialog::Accepted)
+		return;
+	CWType::CrosswordType cwType = newDialog->getCWType();
+	quint16 cwWidth = newDialog->getCWWidth();
+	quint16 cwHeight = newDialog->getCWHeight();
+	quint16 lWidth = newDialog->getLWidth();
+	quint16 tHeight = newDialog->getTHeight();
 }
